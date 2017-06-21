@@ -3,4 +3,4 @@ image: composer
 test:
     script:
         - composer install
-        - bin/phpunit src
+        - bin/phpunit test
