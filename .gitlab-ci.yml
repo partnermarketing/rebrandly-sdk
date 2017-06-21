@@ -1,0 +1,6 @@
+image: composer
+
+test:
+    script:
+        - composer install
+        - bin/phpunit src
