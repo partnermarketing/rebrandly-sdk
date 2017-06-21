@@ -1,0 +1,36 @@
+{
+    "name": "partnermarketing/rebrandly-sdk",
+    "license": "MIT",
+    "type": "library",
+    "description": "PHP SDK For the Rebrandly API",
+    "keywords": ["rebrandly", "PHP", "library", "api"],
+    "homepage": "https://www.spaark.io/",
+    "authors": [
+        {
+            "name": "Emily Shepherd",
+            "email": "emily.shepherd@wearetwogether.com",
+            "homepage": "https://emilyshepherd.me",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/partnermarketing/rebrandly-sdk/issues",
+        "source": "https://github.com/partnermarketing/rebrandly-sdk",
+        "docs": "https://github.com/partnermarketing/rebrandly-sdk/tree/master/docs"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rebrandly\\": "src/",
+            "Rebradly\\Test\\": "test/"
+        }
+    },
+    "require": {
+        "php": ">=5.6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.0"
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
+}
