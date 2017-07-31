@@ -6,39 +6,29 @@ class Link
 {
     private $id;
 
-    private $destination;
+    private $title;
 
     private $slashTag;
 
-    private $description;
+    private $destination;
+
+    private $shortUrl;
 
     private $domain;
+
+    private $status;
 
     private $createdAt;
 
     private $updatedAt;
 
-    private $favourite ;
-
-    private $title;
-
-    private $linkId;
-
-    private $status;
-
-    private $tags;
-
-    private $scripts;
-
     private $clicks;
 
-    private $isprivate;
+    private $lastClickAt;
 
-    private $shortUrl;
+    private $favourite;
 
-    private $domainId;
-
-    private $domainName;
+    private $forwardParameters;
 
     public function getId()
     {
@@ -51,14 +41,14 @@ class Link
         return $this;
     }
 
-    public function getDestination()
+    public function getTitle()
     {
-        return $this->destination;
+        return $this->title;
     }
 
-    public function setDestination($destination)
+    public function setTitle($title)
     {
-        $this->destination = $destination;
+        $this->title = $title;
         return $this;
     }
 
@@ -73,14 +63,25 @@ class Link
         return $this;
     }
 
-    public function getDescription()
+    public function getDestination()
     {
-        return $this->description;
+        return $this->destination;
     }
 
-    public function setDescription($description )
+    public function setDestination($destination)
     {
-        $this->description = $description;
+        $this->destination = $destination;
+        return $this;
+    }
+
+    public function getShortUrl()
+    {
+        return $this->shortUrl;
+    }
+
+    public function setShortUrl($shortUrl)
+    {
+        $this->shortUrl = $shortUrl;
         return $this;
     }
 
@@ -89,9 +90,20 @@ class Link
         return $this->domain;
     }
 
-    public function setDomain($domain)
+    public function setDomain(Domain $domain)
     {
         $this->domain = $domain;
+        return $this;
+    }
+
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    public function setStatus($status)
+    {
+        $this->status = $status;
         return $this;
     }
 
@@ -117,72 +129,6 @@ class Link
         return $this;
     }
 
-    public function getFavourite()
-    {
-        return $this->favourite ;
-    }
-
-    public function setFavourite($favourite)
-    {
-        $this->favourite = $favourite ;
-        return $this;
-    }
-
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    public function setTitle($title)
-    {
-        $this->title = $title;
-        return $this;
-    }
-
-    public function getLinkId()
-    {
-        return $this->linkId;
-    }
-
-    public function setLinkId($linkId)
-    {
-        $this->linkId = $linkId;
-        return $this;
-    }
-
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    public function setStatus($status)
-    {
-        $this->status = $status;
-        return $this;
-    }
-
-    public function getTags()
-    {
-        return $this->tags;
-    }
-
-    public function setTags($tags)
-    {
-        $this->tags = $tags;
-        return $this;
-    }
-
-    public function getScripts()
-    {
-        return $this->scripts;
-    }
-
-    public function setScripts($scripts)
-    {
-        $this->scripts = $scripts;
-        return $this;
-    }
-
     public function getClicks()
     {
         return $this->clicks;
@@ -194,47 +140,37 @@ class Link
         return $this;
     }
 
-    public function getIsPrivate()
+    public function getLastClickAt()
     {
-        return $this->isPrivate;
+        return $this->lastClickAt;
     }
 
-    public function setIsPrivate($isPrivate)
+    public function setLastClickAt($lastClickAt)
     {
-        $this->isPrivate = $isPrivate;
+        $this->lastClickAt = $lastClickAt;
         return $this;
     }
 
-    public function getShortUrl()
+    public function getFavourite()
     {
-        return $this->shortUrl;
+        return $this->favourite ;
     }
 
-    public function setShortUrl($shortUrl)
+    public function setFavourite($favourite)
     {
-        $this->shortUrl = $shortUrl;
+        $this->favourite = $favourite ;
         return $this;
     }
 
-    public function getDomainId()
+    public function getForwardParameters()
     {
-        return $this->domainId;
+        return $this->forwardParameters;
     }
 
-    public function setDomainId($domainId)
+    public function setForwardParameters($forwardParameters)
     {
-        $this->domainId = $domainId;
-        return $this;
-    }
+        $this->forwardParameters = $forwardParameters;
 
-    public function getDomainName()
-    {
-        return $this->domainName;
-    }
-
-    public function setDomainName($domainName)
-    {
-        $this->domainName = $domainName;
         return $this;
     }
 

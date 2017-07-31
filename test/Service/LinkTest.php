@@ -43,13 +43,17 @@ final class LinkServiceTest extends TestCase
 
         $this->httpMock->method('send')->willReturn([
             'shortUrl' => 'http://short',
+            'favourite' => true,
         ]);
 
         $createdLink = $this->linkService->fullCreate($linkModel);
 
+        $createdLink = $this->linkService->fullCreate($linkModel);
+
         $this->assertInstanceOf(LinkModel::class, $createdLink);
-        $this->assertEquals($createdLink->getDestination(), 'http://long');
-        $this->assertEquals($createdLink->getShortUrl(), 'http://short');
+        $this->assertSame($createdLink->getDestination(), 'http://long');
+        $this->assertSame($createdLink->getShortUrl(), 'http://short');
+        $this->assertTrue($createdLink->getFavourite());
     }
 
     public function testQuickCreateLink()
@@ -66,13 +70,5 @@ final class LinkServiceTest extends TestCase
     {
         $linkModel = new LinkModel('doesntmatter');
 
-        $this->httpMock->method('send')->willReturn([
-            'favourite' => true,
-        ]);
-
-        $createdLink = $this->linkService->fullCreate($linkModel);
-        $isFavourite = $createdLink->getFavourite();
-
-        $this->assertTrue($isFavourite);
     }
 }
