@@ -20,7 +20,7 @@ class Link
 
         $this->fullCreate($linkModel);
 
-        return $linkModel->shortUrl;
+        return $linkModel->getShortUrl();
     }
 
     public function fullCreate(LinkModel $linkModel)

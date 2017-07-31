@@ -9,7 +9,13 @@ use Rebrandly\Model\Link as LinkModel;
 
 final class LinkServiceTest extends TestCase
 {
-    private function mockQuickCreateHttp()
+    public function setUp()
+    {
+        $this->httpMock = $this->mockCreateHttp();
+        $this->linkService = $this->reflectLinkService($this->httpMock);
+    }
+
+    private function mockCreateHttp()
     {
         $httpMock = $this->getMockBuilder(Http::class)
             ->disableOriginalConstructor()
@@ -33,17 +39,13 @@ final class LinkServiceTest extends TestCase
 
     public function testFullCreateLink()
     {
-        $httpMock = $this->mockQuickCreateHttp();
-
-        $linkService = $this->reflectLinkService($httpMock);
-
         $linkModel = new LinkModel('http://long');
 
-        $httpMock->method('send')->willReturn([
+        $this->httpMock->method('send')->willReturn([
             'shortUrl' => 'http://short',
         ]);
 
-        $createdLink = $linkService->fullCreate($linkModel);
+        $createdLink = $this->linkService->fullCreate($linkModel);
 
         $this->assertInstanceOf(LinkModel::class, $createdLink);
         $this->assertEquals($createdLink->getDestination(), 'http://long');
@@ -52,13 +54,25 @@ final class LinkServiceTest extends TestCase
 
     public function testQuickCreateLink()
     {
-        $this->markTestIncomplete('');
-        $httpMock = $this->mockQuickCreateHttp();
+        $this->httpMock->method('send')->willReturn([
+            'shortUrl' => 'http://short',
+        ]);
 
-        $linkService = $this->reflectLinkService($httpMock);
-
-        $shortUrl = $link->quickCreate('http://example.com');
-
+        $shortUrl = $this->linkService->quickCreate('http://long');
         $this->assertSame($shortUrl, 'http://short');
+    }
+
+    public function testCreateFavouriteLink()
+    {
+        $linkModel = new LinkModel('doesntmatter');
+
+        $this->httpMock->method('send')->willReturn([
+            'favourite' => true,
+        ]);
+
+        $createdLink = $this->linkService->fullCreate($linkModel);
+        $isFavourite = $createdLink->getFavourite();
+
+        $this->assertTrue($isFavourite);
     }
 }

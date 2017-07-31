@@ -18,7 +18,7 @@ class Link
 
     private $updatedAt;
 
-    private $isFavourite;
+    private $favourite ;
 
     private $title;
 
@@ -117,14 +117,14 @@ class Link
         return $this;
     }
 
-    public function getIsFavourite()
+    public function getFavourite()
     {
-        return $this->isFavourite;
+        return $this->favourite ;
     }
 
-    public function setIsFavourite($isFavourite)
+    public function setFavourite($favourite)
     {
-        $this->isFavourite= $isFavourite;
+        $this->favourite = $favourite ;
         return $this;
     }
 
