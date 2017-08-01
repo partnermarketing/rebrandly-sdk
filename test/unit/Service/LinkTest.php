@@ -1,6 +1,6 @@
 <?php
 
-namespace Rebrandly\Test\Service;
+namespace Rebrandly\Test\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
 use Rebrandly\Model\Link as LinkModel;
@@ -19,7 +19,7 @@ final class LinkServiceTest extends TestCase
     {
         $httpMock = $this->getMockBuilder(Http::class)
             ->disableOriginalConstructor()
-            ->setMethods(['send'])
+            ->setMethods(['post', 'get', 'delete'])
             ->getMock();
         return $httpMock;
     }
@@ -41,12 +41,12 @@ final class LinkServiceTest extends TestCase
     {
         $linkModel = new LinkModel('TestDestination');
 
-        $this->httpMock->method('send')->willReturn([
+        $this->httpMock->method('get')->willReturn([[
             'shortUrl'  => 'TestShortUrl',
             'slashtag'  => 'TestSlashtag',
             'title'     => 'TestTitle',
             'favourite' => true,
-        ]);
+        ]]);
 
         $createdLink = $this->linkService->fullCreate($linkModel);
 
@@ -60,9 +60,9 @@ final class LinkServiceTest extends TestCase
 
     public function testQuickCreateLink()
     {
-        $this->httpMock->method('send')->willReturn([
+        $this->httpMock->method('get')->willReturn([[
             'shortUrl' => 'http://short',
-        ]);
+        ]]);
 
         $shortUrl = $this->linkService->quickCreate('http://long');
         $this->assertSame($shortUrl, 'http://short');

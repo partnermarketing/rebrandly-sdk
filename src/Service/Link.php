@@ -2,6 +2,7 @@
 
 namespace Rebrandly\Service;
 
+use Rebrandly\Model\Domain as DomainModel;
 use Rebrandly\Model\Link as LinkModel;
 use Rebrandly\Service\Http;
 
@@ -25,13 +26,22 @@ class Link
 
     public function fullCreate(LinkModel $linkModel)
     {
+        $method = 'POST';
         $target = 'links';
 
-        $response = $this->http->send($target, $linkModel);
+        $response = $this->http->get($target, $linkModel);
 
-        die(var_dump($reponse));
-        foreach ($response as $key => $value) {
-            // I don't like this.
+        //die(var_dump($response));
+
+        foreach ($response[0] as $key => $value) {
+            if ($key == 'domain') {
+                $tmpDomain = new DomainModel();
+                $tmpDomain->setId($value->id);
+                $tmpDomain->setFullName($value->fullName);
+
+                $value = $tmpDomain;
+            }
+
             $setter = 'set' . $key;
             if (method_exists($linkModel, $setter)) {
                 $linkModel->$setter($value);
@@ -39,5 +49,19 @@ class Link
         }
 
         return $linkModel;
+    }
+
+    public function destroyLink(LinkModel $linkModel)
+    {
+        $method = 'DELETE';
+        $target = 'links/' . $linkModel->getId();
+
+        $params = [
+            'trash' => false,
+        ];
+
+        $response = $this->http->delete($target, $params);
+
+        return $reponse;
     }
 }

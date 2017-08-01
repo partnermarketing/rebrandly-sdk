@@ -1,6 +1,6 @@
 <?php
 
-namespace Rebrandly\Test\Model;
+namespace Rebrandly\Test\Unit\Model;
 
 use PHPUnit\Framework\TestCase;
 use Rebrandly\Model\Domain as DomainModel;

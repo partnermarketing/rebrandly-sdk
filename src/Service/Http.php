@@ -6,7 +6,32 @@ class Http
 {
     private $apiKey;
 
-    public function setApiKey($apiKey)
+    private function startCurl($target)
+    {
+        $ch = curl_init('http://api.rebrandly.com/v1/' . $target);
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'apikey: ' . $this->apiKey,
+            'Content-Type: application/json',
+        ]);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+        return $ch;
+    }
+
+    private function finishCurl($ch)
+    {
+        $json = curl_exec($ch);
+
+        $response = json_decode($json);
+
+        curl_close($ch);
+
+        return $response;
+    }
+
+    private function setApiKey($apiKey)
     {
         if (!preg_match('/^[0-z]{32}$', $apiKey)) {
             throw new InvalidArgumentException('Malformed API key. Expected 32 hexadecimal characters.');
@@ -18,20 +43,38 @@ class Http
         $this->apiKey = $apiKey;
     }
 
-    public function send($target = '', $payload = [])
+    public function post($target, $params = [])
     {
-        $ch = curl_init('http://api.rebrandly.com/v1/' . $target);
+        $ch = $this->startCurl($target);
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'apikey: ' . $this->apiKey,
-            'Content-Type: application/json',
-        ]);
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
 
-        $response = json_decode(curl_exec($ch), true);
-        curl_close($ch);
+        $response = $this->finishCurl($ch);
+
+        return $response;
+    }
+
+    public function get($target, $params = [])
+    {
+        $queryString = http_build_query($params);
+
+        $ch = $this->startCurl($target . $queryString);
+
+        $response = $this->finishCurl($ch);
+
+        return $response;
+    }
+
+    public function delete($target, $params = [])
+    {
+        $queryString = http_build_query($params);
+
+        $ch = $this->startCurl($target . $queryString);
+
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+
+        $reponse = $this->finishCurl($ch);
 
         return $response;
     }
