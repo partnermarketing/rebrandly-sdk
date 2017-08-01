@@ -3,9 +3,9 @@
 namespace Rebrandly\Test\Service;
 
 use PHPUnit\Framework\TestCase;
+use Rebrandly\Model\Link as LinkModel;
 use Rebrandly\Service\Http;
 use Rebrandly\Service\Link as LinkService;
-use Rebrandly\Model\Link as LinkModel;
 
 final class LinkServiceTest extends TestCase
 {
