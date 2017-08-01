@@ -39,7 +39,7 @@ final class LinkServiceTest extends TestCase
 
     public function testFullCreateLink()
     {
-        $linkModel = new LinkModel('TestLongUrl');
+        $linkModel = new LinkModel('TestDestination');
 
         $this->httpMock->method('send')->willReturn([
             'shortUrl'  => 'TestShortUrl',
@@ -51,7 +51,7 @@ final class LinkServiceTest extends TestCase
         $createdLink = $this->linkService->fullCreate($linkModel);
 
         $this->assertInstanceOf(LinkModel::class, $createdLink);
-        $this->assertSame($createdLink->getDestination(),  'TestLongUrl');
+        $this->assertSame($createdLink->getDestination(),  'TestDestination');
         $this->assertSame($createdLink->getShortUrl(),     'TestShortUrl');
         $this->assertSame($createdLink->getSlashtag(),     'TestSlashtag');
         $this->assertSame($createdLink->getTitle(),        'TestTitle');
