@@ -174,6 +174,9 @@ class Link
         return $this;
     }
 
+    // The destination is really the only thing we're pretty much guaranteed to
+    // have from the beginning, as it's what all shortened URLs start out life
+    // as. The rest of that stuff is either optional or comes from Rebrandly.
     public function __construct($destination = ' ')
     {
         $this->setdestination($destination);

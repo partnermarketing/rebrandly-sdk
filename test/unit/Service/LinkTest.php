@@ -41,30 +41,35 @@ final class LinkServiceTest extends TestCase
     {
         $linkModel = new LinkModel('TestDestination');
 
+        // In the real world, this endpoint will return a 1-length numeric
+        // array containing an associative array. This is because the link
+        // creation endpoint can actually accept a POST with several links, so
+        // the response can be arbitrarily long. In this case, we're testing
+        // generating one link, hence the nested structure.
         $this->httpMock->method('get')->willReturn([[
-            'shortUrl'  => 'TestShortUrl',
-            'slashtag'  => 'TestSlashtag',
-            'title'     => 'TestTitle',
+            'shortUrl' => 'TestShortUrl',
+            'slashtag' => 'TestSlashtag',
+            'title' => 'TestTitle',
             'favourite' => true,
         ]]);
 
         $createdLink = $this->linkService->fullCreate($linkModel);
 
         $this->assertInstanceOf(LinkModel::class, $createdLink);
-        $this->assertSame($createdLink->getDestination(),  'TestDestination');
-        $this->assertSame($createdLink->getShortUrl(),     'TestShortUrl');
-        $this->assertSame($createdLink->getSlashtag(),     'TestSlashtag');
-        $this->assertSame($createdLink->getTitle(),        'TestTitle');
+        $this->assertSame($createdLink->getDestination(), 'TestDestination');
+        $this->assertSame($createdLink->getShortUrl(), 'TestShortUrl');
+        $this->assertSame($createdLink->getSlashtag(), 'TestSlashtag');
+        $this->assertSame($createdLink->getTitle(), 'TestTitle');
         $this->assertTrue($createdLink->getFavourite());
     }
 
     public function testQuickCreateLink()
     {
         $this->httpMock->method('get')->willReturn([[
-            'shortUrl' => 'http://short',
+            'shortUrl' => 'TestShortUrl',
         ]]);
 
-        $shortUrl = $this->linkService->quickCreate('http://long');
-        $this->assertSame($shortUrl, 'http://short');
+        $shortUrl = $this->linkService->quickCreate('TestDestination');
+        $this->assertSame($shortUrl, 'TestShortUrl');
     }
 }

@@ -14,6 +14,8 @@ final class LinkServiceTest extends TestCase
         $this->linkService = new LinkService('7d0bc889acf8492ea9dae7221d54b202');
     }
 
+    // Because this actually uses fullCreateLink() under the hood, this is more
+    // complete of a test than it looks.
     public function testQuickCreateLink()
     {
         $shortUrl = $this->linkService->quickCreate('http://example.com/longurlfortesting');
