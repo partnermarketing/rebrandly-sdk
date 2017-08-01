@@ -8,106 +8,97 @@ use Rebrandly\Model\Link as LinkModel;
 
 final class LinkModelTest extends TestCase
 {
+    public function setUp()
+    {
+        $this->createdLink = new LinkModel('TestDestination');
+    }
+
     public function testCreate()
     {
-        $createdLink = new LinkModel('TestDestination');
-        $this->assertInstanceOf(LinkModel::class, $createdLink);
-        $this->assertSame($createdLink->getDestination(), 'TestDestination');
+        $this->assertInstanceOf(LinkModel::class, $this->createdLink);
     }
 
     public function testSetId()
     {
-        $createdLink = new LinkModel('TestDestination');
-        $createdLink->setId('TestId');
+        $this->createdLink->setId('TestId');
 
-        $this->assertSame($createdLink->getId(), 'TestId');
+        $this->assertSame($this->createdLink->getId(), 'TestId');
     }
 
     public function testSetTitle()
     {
-        $createdLink = new LinkModel('TestDestination');
-        $createdLink->setTitle('TestTitle');
+        $this->createdLink->setTitle('TestTitle');
 
-        $this->assertSame($createdLink->getTitle(), 'TestTitle');
+        $this->assertSame($this->createdLink->getTitle(), 'TestTitle');
     }
 
     public function testSetSlashtag()
     {
-        $createdLink = new LinkModel('TestDestination');
-        $createdLink->setSlashtag('TestSlashtag');
+        $this->createdLink->setSlashtag('TestSlashtag');
 
-        $this->assertSame($createdLink->getSlashtag(), 'TestSlashtag');
+        $this->assertSame($this->createdLink->getSlashtag(), 'TestSlashtag');
     }
 
     public function testSetShortUrl()
     {
-        $createdLink = new LinkModel('TestDestination');
-        $createdLink->setShortUrl('TestShortUrl');
+        $this->createdLink->setShortUrl('TestShortUrl');
 
-        $this->assertSame($createdLink->getShortUrl(), 'TestShortUrl');
+        $this->assertSame($this->createdLink->getShortUrl(), 'TestShortUrl');
     }
 
     public function testSetDomain()
     {
-        $createdLink = new LinkModel('TestDestination');
-        $createdLink->setDomain(new DomainModel);
+        $this->createdLink->setDomain(new DomainModel);
 
-        $this->assertInstanceOf(DomainModel::class, $createdLink->getDomain());
+        $this->assertInstanceOf(DomainModel::class, $this->createdLink->getDomain());
     }
 
     public function testSetStatus()
     {
-        $createdLink = new LinkModel('TestDestination');
-        $createdLink->setStatus('TestStatus');
+        $this->createdLink->setStatus('TestStatus');
 
-        $this->assertSame($createdLink->getStatus(), 'TestStatus');
+        $this->assertSame($this->createdLink->getStatus(), 'TestStatus');
     }
 
     public function testSetCreatedAt()
     {
-        $createdLink = new LinkModel('TestDestination');
-        $createdLink->setCreatedAt('TestCreatedAt');
+        $this->createdLink->setCreatedAt('TestCreatedAt');
 
-        $this->assertSame($createdLink->getCreatedAt(), 'TestCreatedAt');
+        $this->assertSame($this->createdLink->getCreatedAt(), 'TestCreatedAt');
     }
 
     public function testSetUpdatedAt()
     {
-        $createdLink = new LinkModel('TestDestination');
-        $createdLink->setUpdatedAt('TestUpdatedAt');
+        $this->createdLink->setUpdatedAt('TestUpdatedAt');
 
-        $this->assertSame($createdLink->getUpdatedAt(), 'TestUpdatedAt');
+        $this->assertSame($this->createdLink->getUpdatedAt(), 'TestUpdatedAt');
     }
 
     public function testSetClicks()
     {
-        $createdLink = new LinkModel('TestDestination');
-        $createdLink->setClicks('TestClicks');
+        $this->createdLink->setClicks('TestClicks');
 
-        $this->assertSame($createdLink->getClicks(), 'TestClicks');
+        $this->assertSame($this->createdLink->getClicks(), 'TestClicks');
     }
 
     public function testSetLastClickAt()
     {
-        $createdLink = new LinkModel('TestDestination');
-        $createdLink->setLastClickAt('TestLastClickAt');
+        $this->createdLink->setLastClickAt('TestLastClickAt');
 
-        $this->assertSame($createdLink->getLastClickAt(), 'TestLastClickAt');
+        $this->assertSame($this->createdLink->getLastClickAt(), 'TestLastClickAt');
     }
 
     public function testSetFavourite()
     {
-        $createdLink = new LinkModel('TestDestination');
-        $createdLink->setFavourite('TestFavourite');
+        $this->createdLink->setFavourite('TestFavourite');
 
-        $this->assertSame($createdLink->getFavourite(), 'TestFavourite');
+        $this->assertSame($this->createdLink->getFavourite(), 'TestFavourite');
     }
 
     public function testSetForwardParameters()
     {
-        $createdLink = new LinkModel('TestDestination');
-        $createdLink->setForwardParameters('TestForwardParameters');
+        $this->createdLink->setForwardParameters('TestForwardParameters');
 
-        $this->assertSame($createdLink->getForwardParameters(), 'TestForwardParameters');
+        $this->assertSame($this->createdLink->getForwardParameters(), 'TestForwardParameters');
     }
 }
