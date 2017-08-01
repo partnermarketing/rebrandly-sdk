@@ -8,7 +8,7 @@ class Link
 
     private $title;
 
-    private $slashTag;
+    private $slashtag;
 
     private $destination;
 
@@ -52,14 +52,14 @@ class Link
         return $this;
     }
 
-    public function getSlashTag()
+    public function getSlashtag()
     {
-        return $this->slashTag;
+        return $this->slashtag;
     }
 
-    public function setSlashTag($slashTag)
+    public function setSlashtag($slashtag)
     {
-        $this->slashTag = $slashTag;
+        $this->slashtag = $slashtag;
         return $this;
     }
 
