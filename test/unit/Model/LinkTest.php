@@ -20,7 +20,6 @@ final class LinkModelTest extends TestCase
         $createdLink = new LinkModel('TestDestination');
         $createdLink->setId('TestId');
 
-        $this->assertInstanceOf(LinkModel::class, $createdLink);
         $this->assertSame($createdLink->getId(), 'TestId');
     }
 
@@ -29,7 +28,6 @@ final class LinkModelTest extends TestCase
         $createdLink = new LinkModel('TestDestination');
         $createdLink->setTitle('TestTitle');
 
-        $this->assertInstanceOf(LinkModel::class, $createdLink);
         $this->assertSame($createdLink->getTitle(), 'TestTitle');
     }
 
@@ -38,7 +36,6 @@ final class LinkModelTest extends TestCase
         $createdLink = new LinkModel('TestDestination');
         $createdLink->setSlashtag('TestSlashtag');
 
-        $this->assertInstanceOf(LinkModel::class, $createdLink);
         $this->assertSame($createdLink->getSlashtag(), 'TestSlashtag');
     }
 
@@ -47,7 +44,6 @@ final class LinkModelTest extends TestCase
         $createdLink = new LinkModel('TestDestination');
         $createdLink->setShortUrl('TestShortUrl');
 
-        $this->assertInstanceOf(LinkModel::class, $createdLink);
         $this->assertSame($createdLink->getShortUrl(), 'TestShortUrl');
     }
 
@@ -56,7 +52,6 @@ final class LinkModelTest extends TestCase
         $createdLink = new LinkModel('TestDestination');
         $createdLink->setDomain(new DomainModel);
 
-        $this->assertInstanceOf(LinkModel::class, $createdLink);
         $this->assertInstanceOf(DomainModel::class, $createdLink->getDomain());
     }
 
@@ -65,7 +60,6 @@ final class LinkModelTest extends TestCase
         $createdLink = new LinkModel('TestDestination');
         $createdLink->setStatus('TestStatus');
 
-        $this->assertInstanceOf(LinkModel::class, $createdLink);
         $this->assertSame($createdLink->getStatus(), 'TestStatus');
     }
 
@@ -74,7 +68,6 @@ final class LinkModelTest extends TestCase
         $createdLink = new LinkModel('TestDestination');
         $createdLink->setCreatedAt('TestCreatedAt');
 
-        $this->assertInstanceOf(LinkModel::class, $createdLink);
         $this->assertSame($createdLink->getCreatedAt(), 'TestCreatedAt');
     }
 
@@ -83,7 +76,6 @@ final class LinkModelTest extends TestCase
         $createdLink = new LinkModel('TestDestination');
         $createdLink->setUpdatedAt('TestUpdatedAt');
 
-        $this->assertInstanceOf(LinkModel::class, $createdLink);
         $this->assertSame($createdLink->getUpdatedAt(), 'TestUpdatedAt');
     }
 
@@ -92,7 +84,6 @@ final class LinkModelTest extends TestCase
         $createdLink = new LinkModel('TestDestination');
         $createdLink->setClicks('TestClicks');
 
-        $this->assertInstanceOf(LinkModel::class, $createdLink);
         $this->assertSame($createdLink->getClicks(), 'TestClicks');
     }
 
@@ -101,7 +92,6 @@ final class LinkModelTest extends TestCase
         $createdLink = new LinkModel('TestDestination');
         $createdLink->setLastClickAt('TestLastClickAt');
 
-        $this->assertInstanceOf(LinkModel::class, $createdLink);
         $this->assertSame($createdLink->getLastClickAt(), 'TestLastClickAt');
     }
 
@@ -110,7 +100,6 @@ final class LinkModelTest extends TestCase
         $createdLink = new LinkModel('TestDestination');
         $createdLink->setFavourite('TestFavourite');
 
-        $this->assertInstanceOf(LinkModel::class, $createdLink);
         $this->assertSame($createdLink->getFavourite(), 'TestFavourite');
     }
 
@@ -119,7 +108,6 @@ final class LinkModelTest extends TestCase
         $createdLink = new LinkModel('TestDestination');
         $createdLink->setForwardParameters('TestForwardParameters');
 
-        $this->assertInstanceOf(LinkModel::class, $createdLink);
         $this->assertSame($createdLink->getForwardParameters(), 'TestForwardParameters');
     }
 }
