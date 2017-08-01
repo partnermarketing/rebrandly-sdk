@@ -29,9 +29,10 @@ class Link
 
         $response = $this->http->send($target, $linkModel);
 
+        die(var_dump($reponse));
         foreach ($response as $key => $value) {
             // I don't like this.
-            $setter = "set" . $key;
+            $setter = 'set' . $key;
             if (method_exists($linkModel, $setter)) {
                 $linkModel->$setter($value);
             }
