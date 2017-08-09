@@ -30,6 +30,8 @@ class Link
 
     private $forwardParameters;
 
+    private $description;
+
     public function getId()
     {
         return $this->id;
@@ -170,6 +172,18 @@ class Link
     public function setForwardParameters($forwardParameters)
     {
         $this->forwardParameters = $forwardParameters;
+
+        return $this;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
 
         return $this;
     }

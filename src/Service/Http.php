@@ -24,7 +24,7 @@ class Http
     {
         $json = curl_exec($ch);
 
-        $response = json_decode($json);
+        $response = json_decode($json, true);
 
         curl_close($ch);
 

@@ -15,6 +15,38 @@ class Link
         $this->http = new Http($apiKey);
     }
 
+    private function prepareRequestBody($action, linkModel $linkModel)
+    {
+        $requiredParams = [
+            'create' => ['destination'],
+            'update' => ['destination', 'slashtag', 'title', 'domain', 'favourite'],
+        ];
+
+        $optionalParams = [
+            'create' => ['slashtag', 'title', 'domain', 'description', 'favourite'],
+            'update' => ['description']
+        ];
+
+        foreach($requiredParams[$action] as $param) {
+            $getter = 'get' . $param;
+            if (!$linkModel->$getter()) {
+                die('Required parameter not set: '. $key . PHP_EOL);
+            }
+        }
+
+        $body = [];
+
+        foreach($requiredParams[$action] + $optionalParams[$action] as $param) {
+            $getter = 'get' . $param;
+            $value = $linkModel->$getter();
+            if ($value) {
+                $body[$param] = $value;
+            }
+        }
+
+        return $body;
+    }
+
     // Just a simple wrapper around the full creation method - intended to save
     // the user from having to actually create a full Link object and pass it
     // back. Effectively just creates a link objects, runs a full create and
@@ -24,27 +56,20 @@ class Link
     {
         $linkModel = new LinkModel($url);
 
-        $this->fullCreate($linkModel);
+        $createdLink = $this->fullCreate($linkModel);
 
         return $linkModel->getShortUrl();
     }
 
     public function fullCreate(LinkModel $linkModel)
     {
-        // We could actually GET here, as there's a shorthand endpoint that
-        // takes a query string to generate one link. But really this method
-        // should eventually expand to support taking an array of links to
-        // generate so we may as well use the POST endpoint from the get go.
-        $method = 'POST';
         $target = 'links';
 
-        $response = $this->http->get($target, $linkModel);
+        $body = $this->prepareRequestBody('create', $linkModel);
 
-        // The link creation endpoint supports creating an arbitrary number of
-        // links at once, so the response is a numeric array. Currently we only
-        // support creating one link at a time, so we just handle the 'first'
-        // response.
-        foreach ($response[0] as $key => $value) {
+        $response = $this->http->post($target, $body);
+
+        foreach ($response as $key => $value) {
             if ($key == 'domain') {
                 $tmpDomain = new DomainModel();
                 $tmpDomain->setId($value->id);
@@ -68,16 +93,23 @@ class Link
 
     // Untested, use at your own peril.
     // May or may not do what it says on the tin.
-    public function destroyLink(LinkModel $linkModel)
+    public function destroy($link, $permanent = true)
     {
         $method = 'DELETE';
-        $target = 'links/' . $linkModel->getId();
 
-        // TODO: Check what the trash flag actually does. This is currently just
-        // set to false because that's what the example on the API demonstration
-        // used.
+        // Because deletion only requires an ID it's fine for us to accept just
+        // the numeric link ID. If the user gives us a full linkModel, extract
+        // only the ID and continue.
+        if ($link instanceof linkModel) {
+            $target = 'links/' . $linkModel->getId();
+        } elseif (is_int($link)) {
+            $target = $link;
+        }
+
+        // Trashing is really tombstoning with a worse name. The link still
+        // exists, it's just not flagged as visible any more.
         $params = [
-            'trash' => false,
+            'trash' => !$permanent,
         ];
 
         $response = $this->http->delete($target, $params);
