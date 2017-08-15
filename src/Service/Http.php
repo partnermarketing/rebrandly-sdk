@@ -26,9 +26,30 @@ class Http
 
         $response = json_decode($json, true);
 
+        $curlInfo = curl_getinfo($ch);
+
         curl_close($ch);
 
         return $response;
+    }
+
+    private function buildQueryString($params = [])
+    {
+        $newParams = [];
+        foreach ($params as $key => $value) {
+            switch ($value) {
+            case true:
+                $newParams[$key] = 'true';
+                break;
+            case false:
+                $newParams[$key] = 'false';
+                break;
+            default:
+                $newParams[$key] = $value;
+            }
+        }
+
+        return http_build_query($newParams);
     }
 
     private function setApiKey($apiKey)
@@ -57,9 +78,9 @@ class Http
 
     public function get($target, $params = [])
     {
-        $queryString = http_build_query($params);
+        $queryString = $this->buildQueryString($params);
 
-        $ch = $this->startCurl($target . $queryString);
+        $ch = $this->startCurl($target . '?' . $queryString);
 
         $response = $this->finishCurl($ch);
 
@@ -68,13 +89,15 @@ class Http
 
     public function delete($target, $params = [])
     {
-        $queryString = http_build_query($params);
+        $queryString = $this->buildQueryString($params);
 
-        $ch = $this->startCurl($target . $queryString);
+        $target .= '?' . $queryString;
+
+        $ch = $this->startCurl($target);
 
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
 
-        $reponse = $this->finishCurl($ch);
+        $response = $this->finishCurl($ch);
 
         return $response;
     }

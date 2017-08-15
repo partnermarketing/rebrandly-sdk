@@ -15,6 +15,10 @@ class Link
         $this->http = new Http($apiKey);
     }
 
+    // TODO: Rename this
+    // Some basic validation to handle compulsory fields when prepping a request
+    // for feeding out to the HTTP handler. Basically just here to check that
+    // all required fields are present, and to strip out any unnecessary ones.
     private function prepareRequestBody($action, linkModel $linkModel)
     {
         $requiredParams = [
@@ -26,13 +30,6 @@ class Link
             'create' => ['slashtag', 'title', 'domain', 'description', 'favourite'],
             'update' => ['description']
         ];
-
-        foreach($requiredParams[$action] as $param) {
-            $getter = 'get' . $param;
-            if (!$linkModel->$getter()) {
-                die('Required parameter not set: '. $key . PHP_EOL);
-            }
-        }
 
         $body = [];
 
@@ -47,18 +44,37 @@ class Link
         return $body;
     }
 
-    // Just a simple wrapper around the full creation method - intended to save
-    // the user from having to actually create a full Link object and pass it
-    // back. Effectively just creates a link objects, runs a full create and
-    // only returns the resulting short URL, the thing a user will probably
-    // most often care about.
+    // Helper function to take an array like the JSON output from the Rebrandly
+    // API and turn it into a useful linkModel.
+    private function buildModelFromArray($link)
+    {
+        $return = new LinkModel('');
+        foreach ($link as $key => $value) {
+            // The API returns a fair bit of stuff that we simply don't care
+            // about, so we keep what we care about and bin the rest. The stuff
+            // we care about is everything detailed in the Rebrandly docs under
+            // the Link model section.
+            $setter = 'set' . $key;
+            if (method_exists($return, $setter)) {
+                $return->$setter($value);
+            }
+        }
+
+        return $return;
+    }
+
+    // This is just a simple wrapper around the full creation method.
+    // As far as the user is concerned, its purpose is to present a minimal
+    // interface for supplying a destination URL and getting back a shortened
+    // URL. Unfortunately the resulting short URL isn't the unique key for a
+    // link so the user needs to be given the whole linkModel objects - this
+    // complicates the simple case but is necessary so that the user has a link
+    // ID to later read, update and delete with.
     public function quickCreate($url)
     {
         $linkModel = new LinkModel($url);
 
-        $createdLink = $this->fullCreate($linkModel);
-
-        return $linkModel->getShortUrl();
+        return $this->fullCreate($linkModel);
     }
 
     public function fullCreate(LinkModel $linkModel)
@@ -69,51 +85,65 @@ class Link
 
         $response = $this->http->post($target, $body);
 
-        foreach ($response as $key => $value) {
-            if ($key == 'domain') {
-                $tmpDomain = new DomainModel();
-                $tmpDomain->setId($value->id);
-                $tmpDomain->setFullName($value->fullName);
+        $createdLink = $this->buildModelFromArray($response);
 
-                $value = $tmpDomain;
-            }
+        return $createdLink;
+    }
 
-            // The API returns a fair bit of stuff that we simply don't care
-            // about, so we keep what we care about and bin the rest. The stuff
-            // we care about is everything detailed in the Rebrandly docs under
-            // the Link model section.
-            $setter = 'set' . $key;
-            if (method_exists($linkModel, $setter)) {
-                $linkModel->$setter($value);
-            }
+    // Gets full details of a single link given either a link ID or a full link
+    // model. If given a link model, it simply extracts the link ID and
+    // continues, as the link ID is the only unique key by which to search links
+    public function getOne($link)
+    {
+        if ($link instanceof linkModel) {
+            $target = 'links/' . $link->getId();
+        } elseif (is_int($link)) {
+            $target = 'links/' . $link;
         }
+
+        $response = $this->http->get($target);
+
+        $linkModel = $this->buildModelFromArray($response);
 
         return $linkModel;
     }
 
-    // Untested, use at your own peril.
-    // May or may not do what it says on the tin.
-    public function destroy($link, $permanent = true)
+    // Link deletion in the API is handled one link at a time by DELETEing on
+    // the link ID. As above, we can accept a full link model and extract the
+    // link ID, or the user can provide it directly.
+    public function delete($link, $permanent = true)
     {
-        $method = 'DELETE';
-
-        // Because deletion only requires an ID it's fine for us to accept just
-        // the numeric link ID. If the user gives us a full linkModel, extract
-        // only the ID and continue.
-        if ($link instanceof linkModel) {
-            $target = 'links/' . $linkModel->getId();
-        } elseif (is_int($link)) {
-            $target = $link;
+        if ($link instanceof LinkModel) {
+            $target = 'links/' . $link->getId();
+        } elseif (is_string($link)) {
+            $target = 'links/' . $link;
         }
 
         // Trashing is really tombstoning with a worse name. The link still
-        // exists, it's just not flagged as visible any more.
+        // exists, it's just not flagged as visible any more. Amazingly, the
+        // default behaviour of the API is to permanently delete, and it only
+        // tombstones if prompted. Whilst that is stupid, we're adhering to that
+        // behaviour for the sake of consistency.
         $params = [
             'trash' => !$permanent,
         ];
 
         $response = $this->http->delete($target, $params);
 
-        return $reponse;
+        return $response;
+    }
+
+    // Very few parameters are actually filterable - you can only filter a
+    // search based on domain, favourite status, or active/trashed status.
+    // There is no functionality to filter by other fields, so while we could
+    // implement this client-side by simply crawling the API its slow response
+    // time makes that an exercise in insanity.
+    public function search($filters)
+    {
+        $target = 'links/';
+
+        $links = $this->http->get($target, $filters);
+
+        return $links;
     }
 }
