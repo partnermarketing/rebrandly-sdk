@@ -3,7 +3,6 @@
 namespace Rebrandly\Test\Integration\Service;
 
 use PHPUnit\Framework\TestCase;
-use Rebrandly\Model\Link as LinkModel;
 use Rebrandly\Service\Http;
 use Rebrandly\Service\Link as LinkService;
 
@@ -18,45 +17,49 @@ final class LinkServiceTest extends TestCase
     {
         $createdLink = $this->linkService->quickCreate('http://example.com/testQuickCreate');
 
-        $this->assertInstanceOf(linkModel::class, $createdLink);
-        $this->assertStringStartsWith('rebrand.ly/', $createdLink->getShortUrl());
+        $this->assertStringStartsWith('rebrand.ly/', $createdLink['shortUrl']);
 
         $this->linkService->delete($createdLink);
     }
 
     public function testFullCreate()
     {
-        $linkModel = new linkModel('http://example.com/testFullCreate');
-        $createdLink = $this->linkService->fullCreate($linkModel);
+        $destination = 'http://example.com/testFullCreate';
 
-        $this->assertInstanceOf(linkModel::class, $createdLink);
-        $this->assertStringStartsWith('rebrand.ly/', $createdLink->getShortUrl());
+        $link = [
+            'destination' => $destination,
+        ];
 
-        $this->linkService->delete($createdLink);
+        $createdLink = $this->linkService->fullCreate($link);
+
+        $this->assertStringStartsWith('rebrand.ly/', $createdLink['shortUrl']);
+
+        $this->linkService->delete($createdLink['id']);
     }
 
     public function testGetOne()
     {
-        $createdLink = $this->linkService->quickCreate('http://example.com/testGetOne');
+        $destination = 'http://example.com/testGetOne';
+        $createdLink = $this->linkService->quickCreate($destination);
 
-        $receivedLink = $this->linkService->getOne($createdLink);
+        $receivedLink = $this->linkService->getOne($createdLink['id']);
 
-        $this->assertInstanceOf(linkModel::class, $receivedLink);
+        $this->assertEquals($destination, $receivedLink['destination']);
 
         $this->linkService->delete($receivedLink);
     }
 
-    public function testGetWithFilter()
+    public function testSearch()
     {
         $createdLinks = [];
 
-        $i = 0;
-        while ($i < 3) {
-            $linkModel = new linkModel('http://example.com/testGetWithFilter' . $i);
-            $linkModel->setFavourite(true);
-            $createdLinks[$i] = $this->linkService->fullCreate($linkModel);
+        for ($i=0; $i<3; $i++) {
+            $link = [
+                'destination' => 'http://example.com/testGetWithFilter' . $i,
+                'favourite' => true,
+            ];
 
-            $i++;
+            $createdLinks[$i] = $this->linkService->fullCreate($link);
         }
 
         $receivedLinks = $this->linkService->search([
@@ -67,7 +70,7 @@ final class LinkServiceTest extends TestCase
         // links which have been favourited, then compare that new array to the
         // original API call response. In theory they should be the same.
         $this->assertSame(
-            array_filter($receivedLinks, function($link){return $link.favourite;}),
+            array_filter($receivedLinks, function($link){return $link['favourite'];}),
             $receivedLinks
         );
 
@@ -81,40 +84,35 @@ final class LinkServiceTest extends TestCase
     {
         $createdLinks = [];
 
-        $i = 0;
-        while ($i < 3) {
-            $linkModel = new linkModel('http://example.com/testPagination' . $i);
-            $linkModel->setFavourite(true);
-            $createdLinks[$i] = $this->linkService->fullCreate($linkModel);
+        for ($i=0; $i<3; $i++) {
+            $link = [
+                'destination' => 'http://example.com/testPagination' . $i,
+                'favourite' => true,
+            ];
 
-            $i++;
+            $createdLinks[$i] = $this->linkService->fullCreate($link);
         }
-        $i = 0;
 
-        while($i < 3) {
+        for ($i=0; $i<3; $i++) {
             $receivedLinks[$i] = $this->linkService->search([
-                'offset' => 0,
-                'limit' => $i,
+                'offset' => $i,
+                'limit' => 0,
             ]);
-            $i++;
         }
         $this->assertTrue(count($receivedLinks) >= 3);
 
         // Clean up after ourselves
         foreach ($createdLinks as $link) {
-            $this->linkService->delete($link);
+            $this->linkService->delete($link['id']);
         }
     }
 
     public function testDeleteById()
     {
-        $linkModel = new LinkModel('http://example.com/testDeleteById');
-        $createdLink = $this->linkService->fullCreate($linkModel);
-        $deleteResult = $this->linkService->delete($createdLink->getId());
+        $createdLink = $this->linkService->quickCreate('http://example.com/testDeleteById');
+        $deleteResult = $this->linkService->delete($createdLink['id']);
 
         // Now that we think we've deleted the link, let's try to get it
-        $emptyLink = $this->linkService->getOne($createdLink->getId());
-
-        $this->assertEquals($emptyLink, new LinkModel(''));
+        $emptyLink = $this->linkService->getOne($createdLink['id']);
     }
 }

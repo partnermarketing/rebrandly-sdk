@@ -2,8 +2,6 @@
 
 namespace Rebrandly\Service;
 
-use Rebrandly\Model\Domain as DomainModel;
-use Rebrandly\Model\Link as LinkModel;
 use Rebrandly\Service\Http;
 
 class Link
@@ -19,7 +17,7 @@ class Link
     // Some basic validation to handle compulsory fields when prepping a request
     // for feeding out to the HTTP handler. Basically just here to check that
     // all required fields are present, and to strip out any unnecessary ones.
-    private function prepareRequestBody($action, linkModel $linkModel)
+    private function prepareRequestBody($action, $link)
     {
         $requiredParams = [
             'create' => ['destination'],
@@ -34,90 +32,59 @@ class Link
         $body = [];
 
         foreach($requiredParams[$action] + $optionalParams[$action] as $param) {
-            $getter = 'get' . $param;
-            $value = $linkModel->$getter();
-            if ($value) {
-                $body[$param] = $value;
+            if (array_key_exists($param, $link)) {
+                $body[$param] = $link[$param];
             }
         }
 
         return $body;
     }
 
-    // Helper function to take an array like the JSON output from the Rebrandly
-    // API and turn it into a useful linkModel.
-    private function buildModelFromArray($link)
-    {
-        $return = new LinkModel('');
-        foreach ($link as $key => $value) {
-            // The API returns a fair bit of stuff that we simply don't care
-            // about, so we keep what we care about and bin the rest. The stuff
-            // we care about is everything detailed in the Rebrandly docs under
-            // the Link model section.
-            $setter = 'set' . $key;
-            if (method_exists($return, $setter)) {
-                $return->$setter($value);
-            }
-        }
-
-        return $return;
-    }
-
     // This is just a simple wrapper around the full creation method.
     // As far as the user is concerned, its purpose is to present a minimal
     // interface for supplying a destination URL and getting back a shortened
-    // URL. Unfortunately the resulting short URL isn't the unique key for a
-    // link so the user needs to be given the whole linkModel objects - this
+    // URL. Unfortunately the resulting short URL isn')t the unique key for a
+    // link so the user needs to be given the whole link objects - this
     // complicates the simple case but is necessary so that the user has a link
     // ID to later read, update and delete with.
     public function quickCreate($url)
     {
-        $linkModel = new LinkModel($url);
+        $link = [
+            'destination' => $url,
+        ];
 
-        return $this->fullCreate($linkModel);
+        return $this->fullCreate($link);
     }
 
-    public function fullCreate(LinkModel $linkModel)
+    public function fullCreate($link)
     {
         $target = 'links';
 
-        $body = $this->prepareRequestBody('create', $linkModel);
+        $body = $this->prepareRequestBody('create', $link);
 
         $response = $this->http->post($target, $body);
 
-        $createdLink = $this->buildModelFromArray($response);
-
-        return $createdLink;
+        return $response;
     }
 
     // Gets full details of a single link given either a link ID or a full link
     // model. If given a link model, it simply extracts the link ID and
     // continues, as the link ID is the only unique key by which to search links
-    public function getOne($link)
+    public function getOne($linkId)
     {
-        if ($link instanceof linkModel) {
-            $target = 'links/' . $link->getId();
-        } elseif (is_int($link)) {
-            $target = 'links/' . $link;
-        }
+        $target = 'links/' . $linkId;
 
         $response = $this->http->get($target);
 
-        $linkModel = $this->buildModelFromArray($response);
-
-        return $linkModel;
+        return $response;
     }
 
     // Link deletion in the API is handled one link at a time by DELETEing on
     // the link ID. As above, we can accept a full link model and extract the
     // link ID, or the user can provide it directly.
-    public function delete($link, $permanent = true)
+    public function delete($linkId, $permanent = true)
     {
-        if ($link instanceof LinkModel) {
-            $target = 'links/' . $link->getId();
-        } elseif (is_string($link)) {
-            $target = 'links/' . $link;
-        }
+        $target = 'links/' . $linkId;
 
         // Trashing is really tombstoning with a worse name. The link still
         // exists, it's just not flagged as visible any more. Amazingly, the
