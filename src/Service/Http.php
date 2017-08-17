@@ -51,7 +51,7 @@ class Http
         return http_build_query($newParams);
     }
 
-    public function __construct($apiKey = '')
+    public function __construct($apiKey)
     {
         $this->apiKey = $apiKey;
     }
