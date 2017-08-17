@@ -51,13 +51,6 @@ class Http
         return http_build_query($newParams);
     }
 
-    private function setApiKey($apiKey)
-    {
-        if (!preg_match('/^[0-z]{32}$', $apiKey)) {
-            throw new InvalidArgumentException('Malformed API key. Expected 32 hexadecimal characters.');
-        }
-    }
-
     public function __construct($apiKey = '')
     {
         $this->apiKey = $apiKey;
