@@ -8,11 +8,23 @@ use Rebrandly\Service\Link as LinkService;
 
 final class LinkServiceTest extends TestCase
 {
+    /*
+     * Loads a valid API key into the link management service to use for
+     * testing
+     *
+     * TODO: Remove the hard-codede API key. Move it into an environment var or
+     * something.
+     */
     public function setUp()
     {
         $this->linkService = new LinkService('7d0bc889acf8492ea9dae7221d54b202');
     }
 
+    /*
+     * Tests quick-creating a link by checking that the creation response
+     * includes the shortUrl, a field we should always expect to get back on a
+     * successful submission
+     */
     public function testQuickCreate()
     {
         $createdLink = $this->linkService->quickCreate('http://example.com/testQuickCreate');
@@ -22,6 +34,11 @@ final class LinkServiceTest extends TestCase
         $this->linkService->delete($createdLink['id']);
     }
 
+    /*
+     * Tests creating a link by checking that the creation response includes
+     * the shortUrl, a field we should always expect to get back on a
+     * successful submission
+     */
     public function testFullCreate()
     {
         $destination = 'http://example.com/testFullCreate';
@@ -37,6 +54,10 @@ final class LinkServiceTest extends TestCase
         $this->linkService->delete($createdLink['id']);
     }
 
+    /*
+     * Tests getting details for a single link by creating a link and then
+     * attempting to retrieve it by its ID.
+     */
     public function testGetOne()
     {
         $destination = 'http://example.com/testGetOne';
@@ -126,6 +147,10 @@ final class LinkServiceTest extends TestCase
         }
     }
 
+    /*
+     * Tests deletion by creating a link, deleting it, then trying to retrieve
+     * it by its ID
+     */
     public function testDeleteById()
     {
         $createdLink = $this->linkService->quickCreate('http://example.com/testDeleteById');
@@ -133,5 +158,9 @@ final class LinkServiceTest extends TestCase
 
         // Now that we think we've deleted the link, let's try to get it
         $emptyLink = $this->linkService->getOne($createdLink['id']);
+
+        // The Rebrandly API helpfully informs us when a link doesn't exist, so
+        // we can test on that
+        $this->assertEquals('NotFound', $emptyLink['code']);
     }
 }
