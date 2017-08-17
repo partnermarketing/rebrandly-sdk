@@ -4,11 +4,13 @@ namespace Rebrandly\Service;
 
 class Http
 {
+    const APIROOT = 'http://api.rebrandly.com/v1/';
+
     private $apiKey;
 
     private function startCurl($target)
     {
-        $ch = curl_init('http://api.rebrandly.com/v1/' . $target);
+        $ch = curl_init(self::APIROOT . $target);
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'apikey: ' . $this->apiKey,
