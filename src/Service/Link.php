@@ -6,6 +6,16 @@ use Rebrandly\Service\Http;
 
 class Link
 {
+    const REQUIREDFIELDS = [
+        'create' => ['destination'],
+        'update' => ['destination', 'slashtag', 'title', 'domain', 'favourite'],
+    ];
+
+    const OPTIONALFIELDS = [
+        'create' => ['slashtag', 'title', 'domain', 'description', 'favourite'],
+        'update' => ['description']
+    ];
+
     private $http;
 
     public function __construct($apiKey)
@@ -13,40 +23,33 @@ class Link
         $this->http = new Http($apiKey);
     }
 
-    // TODO: Rename this
-    // Some basic validation to handle compulsory fields when prepping a request
-    // for feeding out to the HTTP handler. Basically just here to check that
-    // all required fields are present, and to strip out any unnecessary ones.
-    private function prepareRequestBody($action, $link)
+    /*
+     * Ensures all $required fields exist on a $link
+     *
+     * @param array $required A list of fields which must exist on the $link
+     *
+     * @param array $link Information describing the link being validated
+     *
+     * @return array $missingFields Any fields which are required but missing
+     */
+    private function validate($required, $link)
     {
-        $requiredParams = [
-            'create' => ['destination'],
-            'update' => ['destination', 'slashtag', 'title', 'domain', 'favourite'],
-        ];
+        $missing = array_diff_key(array_flip($required), $link);
 
-        $optionalParams = [
-            'create' => ['slashtag', 'title', 'domain', 'description', 'favourite'],
-            'update' => ['description']
-        ];
-
-        $body = [];
-
-        foreach($requiredParams[$action] + $optionalParams[$action] as $param) {
-            if (array_key_exists($param, $link)) {
-                $body[$param] = $link[$param];
-            }
+        if (count($missing)) {
+            throw new InvalidArgumentException("Missing required fields: " . join(' ', $missing));
         }
-
-        return $body;
     }
 
-    // This is just a simple wrapper around the full creation method.
-    // As far as the user is concerned, its purpose is to present a minimal
-    // interface for supplying a destination URL and getting back a shortened
-    // URL. Unfortunately the resulting short URL isn')t the unique key for a
-    // link so the user needs to be given the whole link objects - this
-    // complicates the simple case but is necessary so that the user has a link
-    // ID to later read, update and delete with.
+    /*
+     * Shorthand to shorten a link given nothing but the destination
+     *
+     * @param string $destination The target URL that the shortened link should
+     *    resolve to.
+     *
+     * @return array $link An array populated with the response from the
+     *    Rebrandly API.
+     */
     public function quickCreate($url)
     {
         $link = [
@@ -56,20 +59,60 @@ class Link
         return $this->fullCreate($link);
     }
 
+    /*
+     * Shortens a link given an array with any desired details included
+     *
+     * @param array $link Any fields the user wishes to set on the link before
+     *    creation
+     *
+     * @return array $link An array populated with the response from the
+     *    Rebrandly API.
+     */
     public function fullCreate($link)
     {
         $target = 'links';
 
-        $body = $this->prepareRequestBody('create', $link);
+        try {
+            $this->validate(self::REQUIREDFIELDS['create'], $link);
+        } catch (InvalidArgumentException $e) {
+            return $e;
+        }
 
-        $response = $this->http->post($target, $body);
+        $response = $this->http->post($target, $link);
 
         return $response;
     }
 
-    // Gets full details of a single link given either a link ID or a full link
-    // model. If given a link model, it simply extracts the link ID and
-    // continues, as the link ID is the only unique key by which to search links
+    /*
+     * Updates a link, given an array containing all existing and any new data
+     *
+     * @param array $link An array of all link fields, including those which are
+     *    unchanged.
+     *
+     * @return array $link An updated link as returned from the API
+     */
+    public function update($link)
+    {
+        $target = $link['id'];
+
+        try {
+            $this->validate(self::REQUIREDFIELDS['update'], $link);
+        } catch (InvalidArgumentException $e) {
+            return $e;
+        }
+
+        $response = $this->http->post($target, $link);
+
+        return $response;
+    }
+
+    /*
+     * Gets full details of a single link given its ID
+     *
+     * @param string $linkId the ID of the link, as provided by Rebrandly
+     *
+     * @return array $link A populated link as returned from the API
+     */
     public function getOne($linkId)
     {
         $target = 'links/' . $linkId;
@@ -79,9 +122,17 @@ class Link
         return $response;
     }
 
-    // Link deletion in the API is handled one link at a time by DELETEing on
-    // the link ID. As above, we can accept a full link model and extract the
-    // link ID, or the user can provide it directly.
+    /*
+     * Deletes (optionally: permanently) a link given its ID
+     *
+     * @param string $linkId the ID of the link to delete, as provided by Rebrandly
+     *
+     * @param boolean $permanent Permanently deletes the link, rather than
+     *    marking it as inactive.
+     *
+     * TODO: Check what this response actually is
+     * @return array $response Whatever response the API gives us.
+     */
     public function delete($linkId, $permanent = true)
     {
         $target = 'links/' . $linkId;
@@ -100,11 +151,13 @@ class Link
         return $response;
     }
 
-    // Very few parameters are actually filterable - you can only filter a
-    // search based on domain, favourite status, or active/trashed status.
-    // There is no functionality to filter by other fields, so while we could
-    // implement this client-side by simply crawling the API its slow response
-    // time makes that an exercise in insanity.
+    /*
+     * Search for links meeting some criteria, with sorting controls
+     *
+     * @param array $filters A list of parameters to filter and sort by
+     *
+     * @return array $links A list of links that meet the given criteria
+     */
     public function search($filters)
     {
         $target = 'links/';

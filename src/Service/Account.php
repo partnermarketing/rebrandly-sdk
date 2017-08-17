@@ -13,6 +13,11 @@ class Account
         $this->http = new Http($apiKey);
     }
 
+    /*
+     * Gets the account the current API key belongs to
+     *
+     * @return array $account The current user's Rebrandly account details
+     */
     public function get()
     {
         $target = 'account';

@@ -19,7 +19,7 @@ final class LinkServiceTest extends TestCase
 
         $this->assertStringStartsWith('rebrand.ly/', $createdLink['shortUrl']);
 
-        $this->linkService->delete($createdLink);
+        $this->linkService->delete($createdLink['id']);
     }
 
     public function testFullCreate()
@@ -46,60 +46,79 @@ final class LinkServiceTest extends TestCase
 
         $this->assertEquals($destination, $receivedLink['destination']);
 
-        $this->linkService->delete($receivedLink);
+        $this->linkService->delete($receivedLink['id']);
     }
 
+    /*
+     * Tests search functionality by creating three links that are flagged as
+     * favourites, then retrieving three links with a filter set to only
+     * retrieve favourites.
+     *
+     * We then perform the inverse test to make sure that even in cases where
+     * the real-world data living in Rebrandly would cause one test to pass
+     * coincidentally, we can still catch issues.
+     */
     public function testSearch()
     {
-        $createdLinks = [];
-
-        for ($i=0; $i<3; $i++) {
-            $link = [
-                'destination' => 'http://example.com/testGetWithFilter' . $i,
-                'favourite' => true,
-            ];
-
-            $createdLinks[$i] = $this->linkService->fullCreate($link);
-        }
-
-        $receivedLinks = $this->linkService->search([
+        $destination = 'http://example.com/testGetWithFilter';
+        $favouriteLink = [
+            'destination' => $destination . 'IsFavourite',
             'favourite' => true,
-        ]);
+        ];
+        $notFavouriteLink = [
+            'destination' => $destination . 'IsNotFavourite',
+            'favourite' => false,
+        ];
 
-        // To check that the filter worked, we filter the array to only keep
-        // links which have been favourited, then compare that new array to the
-        // original API call response. In theory they should be the same.
-        $this->assertSame(
-            array_filter($receivedLinks, function($link){return $link['favourite'];}),
-            $receivedLinks
-        );
+        $favouriteLink = $this->linkService->fullCreate($favouriteLink);
+        $notFavouriteLink = $this->linkService->fullCreate($notFavouriteLink);
+
+        $receivedFavouriteLink = $this->linkService->search([
+            'favourite' => true,
+            'limit' => 1,
+        ])[0];
+        $receivedNotFavouriteLink = $this->linkService->search([
+            'favourite' => false,
+            'limit' => 1,
+        ])[0];
+
+        $this->assertTrue($receivedFavouriteLink['favourite']);
+        $this->assertFalse($receivedNotFavouriteLink['favourite']);
 
         // Clean up after ourselves
-        foreach ($createdLinks as $link) {
-            $this->linkService->delete($link);
-        }
+        $this->linkService->delete($favouriteLink['id']);
+        $this->linkService->delete($notFavouriteLink['id']);
     }
 
+    /*
+     * Tests pagination by creating three links and then requesting one link at
+     * a time on different offsets.
+     */
     public function testPagination()
     {
         $createdLinks = [];
 
         for ($i=0; $i<3; $i++) {
-            $link = [
-                'destination' => 'http://example.com/testPagination' . $i,
-                'favourite' => true,
-            ];
-
-            $createdLinks[$i] = $this->linkService->fullCreate($link);
+            $createdLinks[$i] = $this->linkService->quickCreate('http://example.com/testPagination' . $i);
         }
 
+        $receivedLinks = [];
         for ($i=0; $i<3; $i++) {
-            $receivedLinks[$i] = $this->linkService->search([
+            $receivedLinks = array_merge($receivedLinks, $this->linkService->search([
                 'offset' => $i,
-                'limit' => 0,
-            ]);
+                'limit' => 1,
+            ]));
         }
-        $this->assertTrue(count($receivedLinks) >= 3);
+
+        $this->assertEquals(3, count($receivedLinks));
+
+        // Now check that we actually got three different links back by
+        // checking that no entry in the results is identical to any other
+        for ($i=0; $i<3; $i++) {
+            $a = $receivedLinks[$i];
+            $b = $receivedLinks[($i+1)%3];
+            $this->assertNotEquals($a, $b);
+        }
 
         // Clean up after ourselves
         foreach ($createdLinks as $link) {
