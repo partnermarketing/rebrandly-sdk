@@ -10,6 +10,7 @@ use Rebrandly\Service\Link as LinkService;
 final class LinkServiceTest extends TestCase
 {
     private $defaultFakeApiResponse = [
+        'id' => 'TestId',
         'shortUrl' => 'TestShortUrl',
         'slashtag' => 'TestSlashtag',
         'title' => 'TestTitle',
