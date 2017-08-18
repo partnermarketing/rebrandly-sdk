@@ -10,7 +10,7 @@ final class LinkModelTest extends TestCase
 {
     public function setUp()
     {
-        $this->createdLink = new LinkModel('TestDestination');
+        $this->createdLink = new LinkModel();
     }
 
     public function testCreate()

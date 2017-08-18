@@ -29,7 +29,7 @@ class Link
     }
 
     /**
-     * Ensures all $required fields for the requested action exist on a $link
+     * Ensures all required fields for the requested action exist on a $link
      *
      * While the link model includes its own validation of fields on assignment
      * and hence we can trust that any set data is of the correct type etc, the
