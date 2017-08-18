@@ -3,6 +3,7 @@
 namespace Rebrandly\Test\Integration\Service;
 
 use PHPUnit\Framework\TestCase;
+use Rebrandly\Model\Link as LinkModel;
 use Rebrandly\Service\Http;
 use Rebrandly\Service\Link as LinkService;
 
@@ -29,9 +30,9 @@ final class LinkServiceTest extends TestCase
     {
         $createdLink = $this->linkService->quickCreate('http://example.com/testQuickCreate');
 
-        $this->assertStringStartsWith('rebrand.ly/', $createdLink['shortUrl']);
+        $this->assertStringStartsWith('rebrand.ly/', $createdLink->getShortUrl());
 
-        $this->linkService->delete($createdLink['id']);
+        $this->linkService->delete($createdLink->getId());
     }
 
     /*
@@ -43,15 +44,14 @@ final class LinkServiceTest extends TestCase
     {
         $destination = 'http://example.com/testFullCreate';
 
-        $link = [
-            'destination' => $destination,
-        ];
+        $link = new LinkModel();
+        $link->setDestination($destination);
 
         $createdLink = $this->linkService->fullCreate($link);
 
-        $this->assertStringStartsWith('rebrand.ly/', $createdLink['shortUrl']);
+        $this->assertStringStartsWith('rebrand.ly/', $createdLink->getShortUrl());
 
-        $this->linkService->delete($createdLink['id']);
+        $this->linkService->delete($createdLink->getId());
     }
 
     /*
@@ -63,11 +63,11 @@ final class LinkServiceTest extends TestCase
         $destination = 'http://example.com/testGetOne';
         $createdLink = $this->linkService->quickCreate($destination);
 
-        $receivedLink = $this->linkService->getOne($createdLink['id']);
+        $receivedLink = $this->linkService->getOne($createdLink->getId());
 
-        $this->assertEquals($destination, $receivedLink['destination']);
+        $this->assertEquals($destination, $receivedLink->getDestination());
 
-        $this->linkService->delete($receivedLink['id']);
+        $this->linkService->delete($receivedLink->getId());
     }
 
     /*
@@ -82,14 +82,12 @@ final class LinkServiceTest extends TestCase
     public function testSearch()
     {
         $destination = 'http://example.com/testGetWithFilter';
-        $favouriteLink = [
-            'destination' => $destination . 'IsFavourite',
-            'favourite' => true,
-        ];
-        $notFavouriteLink = [
-            'destination' => $destination . 'IsNotFavourite',
-            'favourite' => false,
-        ];
+        $favouriteLink = new LinkModel;
+        $favouriteLink->setDestination($destination . 'IsFavourite');
+        $favouriteLink->setFavourite(true);
+        $notFavouriteLink = new LinkModel;
+        $notFavouriteLink->setDestination($destination . 'IsFavourite');
+        $notFavouriteLink->setFavourite(false);
 
         $favouriteLink = $this->linkService->fullCreate($favouriteLink);
         $notFavouriteLink = $this->linkService->fullCreate($notFavouriteLink);
@@ -103,12 +101,12 @@ final class LinkServiceTest extends TestCase
             'limit' => 1,
         ])[0];
 
-        $this->assertTrue($receivedFavouriteLink['favourite']);
-        $this->assertFalse($receivedNotFavouriteLink['favourite']);
+        $this->assertTrue($receivedFavouriteLink->getFavourite());
+        $this->assertFalse($receivedNotFavouriteLink->getFavourite());
 
         // Clean up after ourselves
-        $this->linkService->delete($favouriteLink['id']);
-        $this->linkService->delete($notFavouriteLink['id']);
+        $this->linkService->delete($favouriteLink->getId());
+        $this->linkService->delete($notFavouriteLink->getId());
     }
 
     /*
@@ -143,24 +141,19 @@ final class LinkServiceTest extends TestCase
 
         // Clean up after ourselves
         foreach ($createdLinks as $link) {
-            $this->linkService->delete($link['id']);
+            $this->linkService->delete($link->getId());
         }
     }
 
     /*
      * Tests deletion by creating a link, deleting it, then trying to retrieve
      * it by its ID
+     *
+     * TODO: Finish this.
      */
     public function testDeleteById()
     {
         $createdLink = $this->linkService->quickCreate('http://example.com/testDeleteById');
-        $deleteResult = $this->linkService->delete($createdLink['id']);
-
-        // Now that we think we've deleted the link, let's try to get it
-        $emptyLink = $this->linkService->getOne($createdLink['id']);
-
-        // The Rebrandly API helpfully informs us when a link doesn't exist, so
-        // we can test on that
-        $this->assertEquals('NotFound', $emptyLink['code']);
+        $deleteResult = $this->linkService->delete($createdLink->getId());
     }
 }

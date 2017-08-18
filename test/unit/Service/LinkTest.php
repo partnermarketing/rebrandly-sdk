@@ -3,6 +3,7 @@
 namespace Rebrandly\Test\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
+use Rebrandly\Model\Link as LinkModel;
 use Rebrandly\Service\Http;
 use Rebrandly\Service\Link as LinkService;
 
@@ -52,19 +53,18 @@ final class LinkServiceTest extends TestCase
 
     public function testFullCreateLink()
     {
-        $link = [
-            'destination' => 'TestDestination',
-        ];
+        $link = new LinkModel();
+        $link->setDestination('TestDestination');
 
-        $this->setResponse('post', $link);
+        $this->setResponse('post', $link->export());
 
         $createdLink = $this->linkService->fullCreate($link);
 
-        $this->assertSame('TestDestination', $createdLink['destination']);
-        $this->assertSame('TestShortUrl', $createdLink['shortUrl']);
-        $this->assertSame('TestSlashtag', $createdLink['slashtag']);
-        $this->assertSame('TestTitle', $createdLink['title']);
-        $this->assertFalse($createdLink['favourite']);
+        $this->assertSame('TestDestination', $createdLink->getDestination());
+        $this->assertSame('TestShortUrl', $createdLink->getShortUrl());
+        $this->assertSame('TestSlashtag', $createdLink->getSlashtag());
+        $this->assertSame('TestTitle', $createdLink->getTitle());
+        $this->assertFalse($createdLink->getFavourite());
     }
 
     public function testQuickCreateLink()
@@ -72,29 +72,24 @@ final class LinkServiceTest extends TestCase
         $this->setResponse('post');
 
         $createdLink = $this->linkService->quickCreate('TestDestination');
-        $this->assertSame($createdLink['shortUrl'], 'TestShortUrl');
+        $this->assertSame($createdLink->getShortUrl(), 'TestShortUrl');
     }
 
     public function testReadLink()
     {
+        $this->setResponse('post');
+        $this->setResponse('get');
+
         // First we need to generate a mocked link to test against, so just run
         // through the usual steps to generate a linkModel.
-        $link = [
-            'destination' => 'TestDestination',
-        ];
-
-        $this->setResponse('post');
+        $createdLink = $this->linkService->quickCreate('TestDestination');
 
         // Since we're testing the ability to get full details for a link given
         // the ID, we now extract the ID from our link to send to the mocked
         // link details endpoint
-        $createdLink = $this->linkService->fullCreate($link);
-        $linkId = $createdLink->id;
-
-        $this->setResponse('get');
+        $linkId = $createdLink->getId();
 
         $readLink = $this->linkService->getOne($linkId);
-
         $this->assertEquals($readLink, $createdLink);
     }
 }

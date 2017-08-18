@@ -2,6 +2,8 @@
 
 namespace Rebrandly\Service;
 
+use Rebrandly\Model\Domain as DomainModel;
+use Rebrandly\Model\Link as LinkModel;
 use Rebrandly\Service\Http;
 
 class Link
@@ -18,100 +20,103 @@ class Link
 
     private $http;
 
+    /**
+     * @param string $apiKey
+     */
     public function __construct($apiKey)
     {
         $this->http = new Http($apiKey);
     }
 
-    /*
-     * Ensures all $required fields exist on a $link
+    /**
+     * Ensures all $required fields for the requested action exist on a $link
      *
-     * @param array $required A list of fields which must exist on the $link
+     * While the link model includes its own validation of fields on assignment
+     * and hence we can trust that any set data is of the correct type etc, the
+     * link model doesn't know about the API's requirements.
      *
-     * @param array $link Information describing the link being validated
+     * @param string $action The action being performed, used to look up which
+     *    fields are required
      *
-     * @return array $missingFields Any fields which are required but missing
+     * @param array $linkArray Array describing the link being validated
      */
-    private function validate($required, $link)
+    private function validate($action, $linkArray)
     {
-        $missing = array_diff_key(array_flip($required), $link);
+        $missing = array_flip(array_diff_key(array_flip(self::REQUIREDFIELDS[$action]), $linkArray));
 
-        if (count($missing)) {
-            throw new InvalidArgumentException("Missing required fields: " . join(' ', $missing));
+        if (count($missing) > 0) {
+            throw new \InvalidArgumentException("Missing required fields: " . join(' ', $missing));
         }
     }
 
-    /*
+    /**
      * Shorthand to shorten a link given nothing but the destination
      *
      * @param string $destination The target URL that the shortened link should
      *    resolve to.
      *
-     * @return array $link An array populated with the response from the
+     * @return LinkModel $link A link populated with the response from the
      *    Rebrandly API.
      */
     public function quickCreate($url)
     {
-        $link = [
-            'destination' => $url,
-        ];
+        $link = new LinkModel();
+        $link->setDestination($url);
 
         return $this->fullCreate($link);
     }
 
-    /*
+    /**
      * Shortens a link given an array with any desired details included
      *
      * @param array $link Any fields the user wishes to set on the link before
      *    creation
      *
-     * @return array $link An array populated with the response from the
+     * @return LinkModel $link A link populated with the response from the
      *    Rebrandly API.
      */
-    public function fullCreate($link)
+    public function fullCreate(LinkModel $link)
     {
         $target = 'links';
+        $linkArray = $link->export();
+        $this->validate('create', $linkArray);
 
-        try {
-            $this->validate(self::REQUIREDFIELDS['create'], $link);
-        } catch (InvalidArgumentException $e) {
-            return $e;
-        }
+        $response = $this->http->post($target, $linkArray);
 
-        $response = $this->http->post($target, $link);
+        $link = new LinkModel();
+        $link->import($response);
 
-        return $response;
+        return $link;
     }
 
-    /*
-     * Updates a link, given an array containing all existing and any new data
+    /**
+     * Updates a link given all existing and any new data
      *
-     * @param array $link An array of all link fields, including those which are
-     *    unchanged.
+     * @param LinkModel $link A new link to update with
      *
-     * @return array $link An updated link as returned from the API
+     * @return LinkModel $link An updated link as returned from the API
      */
     public function update($link)
     {
-        $target = $link['id'];
+        $target = $link->getId();
+        $linkArray = $link->export();
+        $this->validate('update', $linkArray);
 
-        try {
-            $this->validate(self::REQUIREDFIELDS['update'], $link);
-        } catch (InvalidArgumentException $e) {
-            return $e;
-        }
+        $response = $this->http->post($target, $linkArray);
 
-        $response = $this->http->post($target, $link);
+        $link = new LinkModel();
+        $link->import($response);
 
-        return $response;
+        return $link;
     }
 
-    /*
+    /**
      * Gets full details of a single link given its ID
      *
-     * @param string $linkId the ID of the link, as provided by Rebrandly
+     * @param string $linkId the ID of the link, as provided on creation by
+     *    Rebrandly
      *
-     * @return array $link A populated link as returned from the API
+     * @return LinkModel $link A populated link as returned from the API
      */
     public function getOne($linkId)
     {
@@ -119,13 +124,16 @@ class Link
 
         $response = $this->http->get($target);
 
-        return $response;
+        $link = new LinkModel;
+        $link->import($response);
+
+        return $link;
     }
 
-    /*
-     * Deletes (optionally: permanently) a link given its ID
+    /**
+     * Deletes (optionally: permanently) a link
      *
-     * @param string $linkId the ID of the link to delete, as provided by Rebrandly
+     * @param string|object $link The link object or link ID to delete
      *
      * @param boolean $permanent Permanently deletes the link, rather than
      *    marking it as inactive.
@@ -133,15 +141,14 @@ class Link
      * TODO: Check what this response actually is
      * @return array $response Whatever response the API gives us.
      */
-    public function delete($linkId, $permanent = true)
+    public function delete($link, $permanent = true)
     {
-        $target = 'links/' . $linkId;
+        if ($link instanceof LinkModel) {
+            $target = 'links/' . $link->getId();
+        } elseif (is_string($link) || is_integer($link)) {
+            $target = 'links/' . $link;
+        }
 
-        // Trashing is really tombstoning with a worse name. The link still
-        // exists, it's just not flagged as visible any more. Amazingly, the
-        // default behaviour of the API is to permanently delete, and it only
-        // tombstones if prompted. Whilst that is stupid, we're adhering to that
-        // behaviour for the sake of consistency.
         $params = [
             'trash' => !$permanent,
         ];
@@ -151,19 +158,42 @@ class Link
         return $response;
     }
 
-    /*
+    /**
      * Search for links meeting some criteria, with sorting controls
      *
      * @param array $filters A list of parameters to filter and sort by
      *
-     * @return array $links A list of links that meet the given criteria
+     * @return LinkModel[] $links A list of links that meet the given criteria
      */
     public function search($filters)
     {
         $target = 'links/';
 
-        $links = $this->http->get($target, $filters);
+        $response = $this->http->get($target, $filters);
+
+        $links = [];
+        foreach ($response as $linkArray) {
+            $link = new LinkModel;
+            $link->import($linkArray);
+            array_push($links, $link);
+        }
 
         return $links;
+    }
+
+    /**
+     * Count links meeting some criteria
+     *
+     * @param array $filters A list of parameters to filter by
+     *
+     * @return integer $count A count of links that meet the given criteria
+     */
+    public function count($filters)
+    {
+        $target = 'links/count';
+
+        $response = $this->http->get($target, $filters);
+
+        return $response;
     }
 }

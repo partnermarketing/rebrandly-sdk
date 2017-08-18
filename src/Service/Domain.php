@@ -14,39 +14,50 @@ class Domain
         $this->http = new Http($apiKey);
     }
 
-    /*
-     * Gets a domain given its ID as provided by Rebrandly
+    /**
+     * Gets full details of a single domain given its ID
      *
-     * @param string $id ID of the domain to fetch
+     * @param string $domainId the ID of the domain, as provided on creation by
+     *    Rebrandly
      *
-     * @return array $domain The complete domain as returned from the API
+     * @return domainModel $domain A populated domain as returned from the API
      */
-    public function getOne($id)
+    public function getOne($domainId)
     {
-        $target = 'domains/' . $id;
+        $target = 'domains/' . $domainId;
 
-        $domain = $this->http->get($target);
+        $response = $this->http->get($target);
+
+        $domain = new DomainModel;
+        $domain->import($response);
 
         return $domain;
     }
 
-    /*
-     * Gets domains based on search criteria, with sorting
+     /**
+     * Search for domains meeting some criteria, with sorting controls
      *
-     * @param array $params A list of criteria for filtering and sorting results
+     * @param array $filters A list of parameters to filter and sort by
      *
-     * @return array $domains A list of domains matching the given criteria
+     * @return DomainModel[] $domains A list of domains that meet the given criteria
      */
-    public function search($params)
+    public function search($filters)
     {
         $target = 'domains/';
 
-        $domains = $this->http->get($target, $params);
+        $response = $this->http->get($target, $filters);
+
+        $domains = [];
+        foreach ($response as $domainArray) {
+            $domain = new DomainModel;
+            $domain->import($domainArray);
+            array_push($domains, $domain);
+        }
 
         return $domains;
     }
 
-    /*
+    /**
      * Counts domains, with optional filters
      *
      * @param array $filters Fields to restrict the count by

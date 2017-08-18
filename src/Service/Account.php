@@ -2,6 +2,7 @@
 
 namespace Rebrandly\Service;
 
+use Rebrandly\Model\Account as AccountModel;
 use Rebrandly\Service\Http;
 
 class Account
@@ -13,16 +14,19 @@ class Account
         $this->http = new Http($apiKey);
     }
 
-    /*
+    /**
      * Gets the account the current API key belongs to
      *
-     * @return array $account The current user's Rebrandly account details
+     * @return AccountModel $account The current user's Rebrandly account details
      */
     public function get()
     {
         $target = 'account';
 
-        $account = $this->http->get($target);
+        $response = $this->http->get($target);
+
+        $account = new AccountModel;
+        $account->import($response);
 
         return $account;
     }
