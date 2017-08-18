@@ -67,7 +67,7 @@ class Link
     }
 
     /**
-     * Shortens a link given an array with any desired details included
+     * Creates a link given LinkModel with any desired details
      *
      * @param array $link Any fields the user wishes to set on the link before
      *    creation
