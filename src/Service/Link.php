@@ -120,6 +120,12 @@ class Link
      */
     public function getOne($linkId)
     {
+        if (!is_integer($linkId) && !is_string($linkId)) {
+            $type = gettype($linkId);
+            $errorText = printf('Expected linkId to be stringy or an integer, %s supplied', $type);
+            throw new \InvalidArgumentException($errorText);
+        }
+
         $target = 'links/' . $linkId;
 
         $response = $this->http->get($target);
