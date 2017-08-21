@@ -170,7 +170,7 @@ class Link
     }
 
     /**
-     * Turns a link-like array into an actual link object
+     * Turns a link-like linkArray into an actual link object
      *
      * @param array $linkArray An array containing all data to be assigned into the
      *    link
