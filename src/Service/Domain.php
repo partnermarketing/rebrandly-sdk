@@ -5,6 +5,11 @@ namespace Rebrandly\Service;
 use Rebrandly\Model\Domain as DomainModel;
 use Rebrandly\Service\Http;
 
+/**
+ * Domain Service
+ *
+ * Handles API requests for all Domain related actions
+ */
 class Domain
 {
     private $http;

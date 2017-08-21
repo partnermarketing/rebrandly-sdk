@@ -6,6 +6,11 @@ use Rebrandly\Model\Domain as DomainModel;
 use Rebrandly\Model\Link as LinkModel;
 use Rebrandly\Service\Http;
 
+/**
+ * Link Service
+ *
+ * Handles API requests for all link related actions
+ */
 class Link
 {
     const REQUIREDFIELDS = [

@@ -5,6 +5,11 @@ namespace Rebrandly\Service;
 use Rebrandly\Model\Account as AccountModel;
 use Rebrandly\Service\Http;
 
+/**
+ * Account Service
+ *
+ * Handles API requests for all account related actions
+ */
 class Account
 {
     private $http;
