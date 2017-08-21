@@ -81,11 +81,10 @@ class Domain
         ];
 
         $domainArray= [];
-        foreach ($exportFields as $fieldName) {
-            $getter = 'get' . $fieldName;
-            $value = $this->$getter();
+        foreach ($exportFields as $field) {
+            $value = $this->$field;
             if ($value) {
-                $domainArray[$fieldName] = $value;
+                $domainArray[$field] = $value;
             }
         }
         return $domainArray;
