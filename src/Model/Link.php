@@ -4,6 +4,12 @@ namespace Rebrandly\Model;
 
 use Rebrandly\Model\Domain as DomainModel;
 
+/**
+ * Link Model
+ *
+ * Stores and recalls information about a Rebrandly link as described at
+ * https://developers.rebrandly.com/docs/link-entity
+ */
 class Link
 {
     private $id;

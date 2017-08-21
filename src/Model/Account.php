@@ -2,6 +2,12 @@
 
 namespace Rebrandly\Model;
 
+/**
+ * Account Model
+ *
+ * Stores and recalls information about a Rebrandly account as described at
+ * https://developers.rebrandly.com/docs/account-model
+ */
 class Account
 {
     private $id;

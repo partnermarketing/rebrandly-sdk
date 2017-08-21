@@ -2,6 +2,12 @@
 
 namespace Rebrandly\Model;
 
+/**
+ * Domain Model
+ *
+ * Stores and recalls information about a Rebrandly as described at
+ * https://developers.rebrandly.com/docs/branded-domain-model
+ */
 class Domain
 {
     private $id;
