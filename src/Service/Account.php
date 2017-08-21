@@ -25,8 +25,7 @@ class Account
 
         $response = $this->http->get($target);
 
-        $account = new AccountModel;
-        $account->import($response);
+        $account = AccountModel::import($response);
 
         return $account;
     }

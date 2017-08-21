@@ -185,11 +185,15 @@ class Link
      *
      * @return void
      */
-    public function import($linkArray)
+    static function import($linkArray)
     {
+        $link = new Link;
+
         foreach ($linkArray as $key => $value) {
-            $this->$key = $value;
+            $link->$key = $value;
         }
+
+        return $link;
     }
 
     /**

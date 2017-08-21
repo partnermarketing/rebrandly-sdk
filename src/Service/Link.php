@@ -83,8 +83,7 @@ class Link
 
         $response = $this->http->post($target, $linkArray);
 
-        $link = new LinkModel();
-        $link->import($response);
+        $link = LinkModel::import($response);
 
         return $link;
     }
@@ -104,8 +103,7 @@ class Link
 
         $response = $this->http->post($target, $linkArray);
 
-        $link = new LinkModel();
-        $link->import($response);
+        $link = LinkModel::import($response);
 
         return $link;
     }
@@ -130,8 +128,7 @@ class Link
 
         $response = $this->http->get($target);
 
-        $link = new LinkModel;
-        $link->import($response);
+        $link = LinkModel::import($response);
 
         return $link;
     }
@@ -196,8 +193,7 @@ class Link
 
         $links = [];
         foreach ($response as $linkArray) {
-            $link = new LinkModel;
-            $link->import($linkArray);
+            $link = LinkModel::import($linkArray);
             array_push($links, $link);
         }
 

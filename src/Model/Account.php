@@ -24,9 +24,9 @@ class Account
 
     private $subscription;
 
-    public function getId()
+    public function getCreatedAt()
     {
-        return $this->id;
+        return $this->createdAt;
     }
 
     public function getFullName()
@@ -34,14 +34,19 @@ class Account
         return $this->username;
     }
 
-    public function getcreatedAt()
+    public function getId()
     {
-        return $this->createdAt;
+        return $this->id;
     }
 
-    public function getsubscription()
+    public function getSubscription()
     {
         return $this->subscription;
+    }
+
+    public function getUsername()
+    {
+        return $this->username;
     }
 
     /**
@@ -52,11 +57,15 @@ class Account
      *
      * @return void
      */
-    public function import($accountArray)
+    static function import($accountArray)
     {
+        $account = new Account;
+
         foreach ($accountArray as $key => $value) {
-            $this->$key = $value;
+            $account->$key = $value;
         }
+
+        return $account;
     }
 
     /**

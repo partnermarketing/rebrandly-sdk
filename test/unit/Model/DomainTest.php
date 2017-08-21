@@ -16,4 +16,18 @@ final class DomainModelTest extends TestCase
     {
         $this->assertInstanceOf(DomainModel::class, $this->createdDomain);
     }
+
+    public function testImport()
+    {
+        $domainArray = [
+            'id' => 'TestId',
+            'fullName' => 'TestFullName',
+            'topLevelDomain' => 'TestTopLevelDomain',
+        ];
+
+        $domain = DomainModel::import($domainArray);
+
+        $this->assertInstanceOf(DomainModel::class, $domain);
+        $this->assertEquals('TestFullName', $domain->getFullName());
+    }
 }

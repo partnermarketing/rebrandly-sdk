@@ -38,4 +38,20 @@ final class LinkModelTest extends TestCase
 
         $this->assertInstanceOf(DomainModel::class, $this->createdLink->getDomain());
     }
+
+    public function testImport()
+    {
+        $linkArray = [
+            'id' => 'TestId',
+            'shortUrl' => 'TestShortUrl',
+            'slashtag' => 'TestSlashtag',
+            'title' => 'TestTitle',
+            'favourite' => false,
+        ];
+
+        $link = LinkModel::import($linkArray);
+
+        $this->assertInstanceOf(LinkModel::class, $link);
+        $this->assertEquals('TestShortUrl', $link->getShortUrl());
+    }
 }

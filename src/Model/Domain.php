@@ -67,11 +67,15 @@ class Domain
      *
      * @return void
      */
-    public function import($domainArray)
+    static function import($domainArray)
     {
+        $domain = new Domain;
+
         foreach ($domainArray as $key => $value) {
-            $this->$key = $value;
+            $domain->$key = $value;
         }
+
+        return $domain;
     }
 
     /**

@@ -28,8 +28,7 @@ class Domain
 
         $response = $this->http->get($target);
 
-        $domain = new DomainModel;
-        $domain->import($response);
+        $domain = DomainModel::import($response);
 
         return $domain;
     }
@@ -49,8 +48,7 @@ class Domain
 
         $domains = [];
         foreach ($response as $domainArray) {
-            $domain = new DomainModel;
-            $domain->import($domainArray);
+            $domain = DomainModel::import($domainArray);
             array_push($domains, $domain);
         }
 
