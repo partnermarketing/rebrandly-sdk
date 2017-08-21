@@ -8,6 +8,13 @@ class Http
 
     private $apiKey;
 
+    /**
+     * Initialises a curl handle with defaults we always need
+     *
+     * @param string $target The API endpoint being used
+     *
+     * @return curl $ch
+     */
     private function startCurl($target)
     {
         $ch = curl_init(self::APIROOT . $target);
@@ -22,6 +29,13 @@ class Http
         return $ch;
     }
 
+    /**
+     * Fires the request, parses the response, and closes the curl handle
+     *
+     * @param curl
+     *
+     * @return array $response The JSON-decoded response from the API
+     */
     private function finishCurl($ch)
     {
         $json = curl_exec($ch);
@@ -35,6 +49,16 @@ class Http
         return $response;
     }
 
+    /**
+     * Transforms an associative array of parameters into a query string.
+     * Includes special cases to handle booleans, as the Rebrandly API doesn't
+     * accept PHP's default string casts of bools as bools, and they need
+     * rewriting into 'true' or 'false' strings.
+     *
+     * @param array
+     *
+     * @return string
+     */
     private function buildQueryString($params = [])
     {
         $newParams = [];
@@ -51,11 +75,22 @@ class Http
         return http_build_query($newParams);
     }
 
+    /**
+     * @param string $apiKey An API key as provided from
+     * https://www.rebrandly.com/api-settings
+     */
     public function __construct($apiKey)
     {
         $this->apiKey = $apiKey;
     }
 
+    /**
+     * @param string $target API endpoint URL
+     *
+     * @param array|null $params Any data required to be sent as POST body
+     *
+     * @return array $response Parsed response from the API
+     */
     public function post($target, $params = [])
     {
         $ch = $this->startCurl($target);
@@ -68,6 +103,13 @@ class Http
         return $response;
     }
 
+    /**
+     * @param string $target API endpoint URL
+     *
+     * @param array|null $params Any data required to be sent as a query string
+     *
+     * @return array $response Parsed response from the API
+     */
     public function get($target, $params = [])
     {
         $queryString = $this->buildQueryString($params);
@@ -79,6 +121,13 @@ class Http
         return $response;
     }
 
+    /**
+     * @param string $target API endpoint URL
+     *
+     * @param array|null $params Any data required to be sent as a query string
+     *
+     * @return array $response Parsed response from the API
+     */
     public function delete($target, $params = [])
     {
         $queryString = $this->buildQueryString($params);
