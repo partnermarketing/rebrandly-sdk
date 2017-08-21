@@ -32,7 +32,7 @@ final class LinkServiceTest extends TestCase
 
         $this->assertStringStartsWith('rebrand.ly/', $createdLink->getShortUrl());
 
-        $this->linkService->delete($createdLink->getId());
+        $this->linkService->delete($createdLink);
     }
 
     /*
@@ -51,7 +51,7 @@ final class LinkServiceTest extends TestCase
 
         $this->assertStringStartsWith('rebrand.ly/', $createdLink->getShortUrl());
 
-        $this->linkService->delete($createdLink->getId());
+        $this->linkService->delete($createdLink);
     }
 
     /*
@@ -67,7 +67,7 @@ final class LinkServiceTest extends TestCase
 
         $this->assertEquals($destination, $receivedLink->getDestination());
 
-        $this->linkService->delete($receivedLink->getId());
+        $this->linkService->delete($receivedLink);
     }
 
     /*
@@ -105,8 +105,8 @@ final class LinkServiceTest extends TestCase
         $this->assertFalse($receivedNotFavouriteLink->getFavourite());
 
         // Clean up after ourselves
-        $this->linkService->delete($favouriteLink->getId());
-        $this->linkService->delete($notFavouriteLink->getId());
+        $this->linkService->delete($favouriteLink);
+        $this->linkService->delete($notFavouriteLink);
     }
 
     /*
@@ -141,19 +141,21 @@ final class LinkServiceTest extends TestCase
 
         // Clean up after ourselves
         foreach ($createdLinks as $link) {
-            $this->linkService->delete($link->getId());
+            $this->linkService->delete($link);
         }
     }
 
     /*
-     * Tests deletion by creating a link, deleting it, then trying to retrieve
-     * it by its ID
-     *
+     * Tests link deletion by creating a new link, deleting it, then checking
+     * whether the deleted link still exists
      * TODO: Finish this.
      */
-    public function testDeleteById()
+    public function testDelete()
     {
         $createdLink = $this->linkService->quickCreate('http://example.com/testDeleteById');
-        $deleteResult = $this->linkService->delete($createdLink->getId());
+        $deleteResult = $this->linkService->delete($createdLink);
+        $invalidLink = $this->linkService->getOne($createdLink->getId());
+
+        $this->assertEquals('NotFound', $invalidLink->code);
     }
 }

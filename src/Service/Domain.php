@@ -9,7 +9,7 @@ class Domain
 {
     private $http;
 
-    public function __construct__($apiKey)
+    public function __construct($apiKey)
     {
         $this->http = new Http($apiKey);
     }

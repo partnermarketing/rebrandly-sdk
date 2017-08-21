@@ -139,7 +139,7 @@ class Link
     /**
      * Deletes (optionally: permanently) a link
      *
-     * @param string|object $link The link object or link ID to delete
+     * @param LinkModel $link The link to delete
      *
      * @param boolean $permanent Permanently deletes the link, rather than
      *    marking it as inactive.
@@ -147,13 +147,30 @@ class Link
      * TODO: Check what this response actually is
      * @return array $response Whatever response the API gives us.
      */
-    public function delete($link, $permanent = true)
+    public function delete(LinkModel $link, $permanent = true)
     {
-        if ($link instanceof LinkModel) {
-            $target = 'links/' . $link->getId();
-        } elseif (is_string($link) || is_integer($link)) {
-            $target = 'links/' . $link;
-        }
+        $linkId = $link->getId();
+
+        $response = $this->deleteById($linkId,  $permanent);
+
+        return $response;
+    }
+
+    /**
+     * Alternate means to call delete, accepting a link ID rather than a full
+     * link model.
+     *
+     * @param integer $linkId The link ID to delete
+     *
+     * @param boolean $permanent Permanently deletes the link, rather than
+     *    marking it as inactive.
+     *
+     * TODO: Check what this response actually is
+     * @return array $response Whatever response the API gives us.
+     */
+    public function deleteById($linkId, $permanent)
+    {
+        $target = 'links/' . $linkId;
 
         $params = [
             'trash' => !$permanent,
