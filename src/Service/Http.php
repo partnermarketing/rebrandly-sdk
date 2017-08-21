@@ -2,6 +2,12 @@
 
 namespace Rebrandly\Service;
 
+/**
+ * Http Service
+ *
+ * Mostly just a wrapper around curl, but also handles some parameter parsing
+ * and helps deal with a few little quirks of the Rebrandly API.
+ */
 class Http
 {
     const APIROOT = 'http://api.rebrandly.com/v1/';
