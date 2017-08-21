@@ -2,6 +2,8 @@
 
 namespace Rebrandly\Model;
 
+use Rebrandly\Model\Domain as DomainModel;
+
 class Link
 {
     private $id;
@@ -125,7 +127,7 @@ class Link
         return $this;
     }
 
-    public function setDomain($domain)
+    public function setDomain(DomainModel $domain)
     {
         if (!$domain instanceof Domain) {
             $type = gettype($domain);
