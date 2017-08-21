@@ -17,6 +17,10 @@ class Account
      */
     private $http;
 
+    /**
+     * @param string $apiKey An API key as provided from
+     * https://www.rebrandly.com/api-settings
+     */
     public function __construct($apiKey)
     {
         $this->http = new Http($apiKey);
