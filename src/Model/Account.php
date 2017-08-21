@@ -73,8 +73,7 @@ class Account
 
         $accountArray= [];
         foreach ($exportFields as $fieldName) {
-            $getter = 'get' . $fieldName;
-            $value = $this->$getter();
+            $value = $this->$fieldName;
             if ($value) {
                 $accountArray[$fieldName] = $value;
             }

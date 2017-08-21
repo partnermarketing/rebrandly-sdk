@@ -207,8 +207,7 @@ class Link
 
         $linkArray= [];
         foreach ($exportFields as $fieldName) {
-            $getter = 'get' . $fieldName;
-            $value = $this->$getter();
+            $value = $this->$fieldName;
             if ($value) {
                 $linkArray[$fieldName] = $value;
             }
