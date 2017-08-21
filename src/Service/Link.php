@@ -13,14 +13,13 @@ use Rebrandly\Service\Http;
  */
 class Link
 {
+    /**
+     * @var array Lists of which fields are required for particular operations
+     *    Used for validation of link models before submission to the API
+     */
     const REQUIREDFIELDS = [
         'create' => ['destination'],
         'update' => ['destination', 'slashtag', 'title', 'domain', 'favourite'],
-    ];
-
-    const OPTIONALFIELDS = [
-        'create' => ['slashtag', 'title', 'domain', 'description', 'favourite'],
-        'update' => ['description']
     ];
 
     /**
