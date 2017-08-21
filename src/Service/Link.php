@@ -23,6 +23,9 @@ class Link
         'update' => ['description']
     ];
 
+    /**
+     * @var Http $http HTTP helper class shared by all Rebrandly SDK services
+     */
     private $http;
 
     /**

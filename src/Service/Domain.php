@@ -12,6 +12,9 @@ use Rebrandly\Service\Http;
  */
 class Domain
 {
+    /**
+     * @var Http $http HTTP helper class shared by all Rebrandly SDK services
+     */
     private $http;
 
     public function __construct($apiKey)
