@@ -102,7 +102,7 @@ class Link
      *
      * @return LinkModel $link An updated link as returned from the API
      */
-    public function update($link)
+    public function update(LinkModel $link)
     {
         $target = $link->getId();
         $linkArray = $link->export();
@@ -172,7 +172,7 @@ class Link
      * TODO: Check what this response actually is
      * @return array $response Whatever response the API gives us.
      */
-    public function deleteById($linkId, $permanent)
+    public function deleteById($linkId, $permanent = true)
     {
         $target = 'links/' . $linkId;
 
@@ -192,7 +192,7 @@ class Link
      *
      * @return LinkModel[] $links A list of links that meet the given criteria
      */
-    public function search($filters)
+    public function search($filters = [])
     {
         $target = 'links/';
 
@@ -214,7 +214,7 @@ class Link
      *
      * @return integer $count A count of links that meet the given criteria
      */
-    public function count($filters)
+    public function count($filters = [])
     {
         $target = 'links/count';
 

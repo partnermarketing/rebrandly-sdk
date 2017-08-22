@@ -93,7 +93,7 @@ class Http
     /**
      * @param string $target API endpoint URL
      *
-     * @param array|null $params Any data required to be sent as POST body
+     * @param array $params Any data required to be sent as POST body
      *
      * @return array $response Parsed response from the API
      */
@@ -112,7 +112,7 @@ class Http
     /**
      * @param string $target API endpoint URL
      *
-     * @param array|null $params Any data required to be sent as a query string
+     * @param array $params Any data required to be sent as a query string
      *
      * @return array $response Parsed response from the API
      */
@@ -130,7 +130,7 @@ class Http
     /**
      * @param string $target API endpoint URL
      *
-     * @param array|null $params Any data required to be sent as a query string
+     * @param array $params Any data required to be sent as a query string
      *
      * @return array $response Parsed response from the API
      */
