@@ -1,10 +1,10 @@
 {
     "name": "partnermarketing/rebrandly-sdk",
-    "license": "MIT",
+    "license": "Apache-2.0",
     "type": "library",
     "description": "PHP SDK For the Rebrandly API",
     "keywords": ["rebrandly", "PHP", "library", "api"],
-    "homepage": "https://www.spaark.io/",
+    "homepage": "https://www.partnermarketing.com/",
     "authors": [
         {
             "name": "Emily Shepherd",
