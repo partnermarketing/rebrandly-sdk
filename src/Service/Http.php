@@ -70,7 +70,7 @@ class Http
         $newParams = [];
         foreach ($params as $key => $value) {
             switch (gettype($value)) {
-            case boolean:
+            case 'boolean':
                 $newParams[$key] = $value ? 'true' : 'false';
                 break;
             default:
