@@ -48,7 +48,7 @@ class Domain
      *
      * @return DomainModel[] $domains A list of domains that meet the given criteria
      */
-    public function search($filters)
+    public function search($filters = [])
     {
         $target = 'domains/';
 
@@ -70,7 +70,7 @@ class Domain
      *
      * @return array $domains A list of domains matching the given criteria
      */
-    public function count($filters)
+    public function count($filters = [])
     {
         $target = 'domains/count';
 
