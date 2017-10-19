@@ -29,7 +29,7 @@ final class DomainServiceTest extends TestCase
      */
     public function testCount()
     {
-        $count = $this->domainService->count()['count'];
+        $count = $this->domainService->count();
 
         $this->assertInternalType('int', $count);
     }
