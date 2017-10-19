@@ -220,6 +220,6 @@ class Link
 
         $response = $this->http->get($target, $filters);
 
-        return $response;
+        return !empty($response['count']) ? (int)$response['count'] : 0;
     }
 }

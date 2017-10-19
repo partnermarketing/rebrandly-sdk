@@ -68,14 +68,14 @@ class Domain
      *
      * @param array $filters Fields to restrict the count by
      *
-     * @return array $domains A list of domains matching the given criteria
+     * @return integer $count A count of domains matching the given criteria
      */
     public function count($filters = [])
     {
         $target = 'domains/count';
 
-        $count = $this->http->get($target, $filters);
+        $response = $this->http->get($target, $filters);
 
-        return $count;
+        return !empty($response['count']) ? (int)$response['count'] : 0;
     }
 }
