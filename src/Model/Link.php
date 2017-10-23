@@ -135,7 +135,7 @@ class Link
 
     public function setDomain(DomainModel $domain)
     {
-        if (!$domain instanceof Domain) {
+        if (!$domain instanceof DomainModel) {
             $type = gettype($domain);
             $errorText = printf('Expected domain to be an instance of a DomainModel, %s supplied', $type);
             throw new \InvalidArgumentException($errorText);
