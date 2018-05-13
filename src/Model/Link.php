@@ -213,7 +213,7 @@ class Link
         foreach ($exportFields as $fieldName) {
             $value = $this->$fieldName;
             if ($value) {
-                $linkArray[$fieldName] = $value;
+                $linkArray[$fieldName] = ($fieldName === 'domain') ? $value->export() : $value;
             }
         }
         return $linkArray;
