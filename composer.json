@@ -1,5 +1,5 @@
 {
-    "name": "partnermarketing/rebrandly-sdk",
+    "name": "siluet/rebrandly-sdk",
     "license": "Apache-2.0",
     "type": "library",
     "description": "PHP SDK For the Rebrandly API",
